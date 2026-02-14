@@ -33,6 +33,7 @@
     "deploy": "turbo -F @tacos/infra deploy",
     "destroy": "turbo -F @tacos/infra destroy",
     "check": "oxlint && oxfmt --write",
+    "lint": "oxlint && oxfmt --check",
     "prepare": "husky"
   },
   "dependencies": {
