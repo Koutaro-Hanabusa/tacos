@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsdown",
+    "check-types": "tsc -b",
+    "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
+  },
+  "dependencies": {
+    "@hono/trpc-server": "^0.4.0",
+    "@tacos/api": "workspace:*",
+    "@tacos/db": "workspace:*",
+    "@tacos/env": "workspace:*",
+    "@trpc/server": "catalog:",
+    "dotenv": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@tacos/config": "workspace:*",
+    "@types/node": "catalog:",
+    "alchemy": "catalog:",
+    "tsdown": "^0.16.5",
+    "typescript": "catalog:",
+    "wrangler": "^4.54.0"
+  }
+}
