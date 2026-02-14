@@ -7,5 +7,12 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  return <TacoMap />;
+  return (
+    <div className="flex h-screen flex-row">
+      <div className="w-[30%]">何かしら</div>
+      <div className="flex-1">
+        <TacoMap />
+      </div>
+    </div>
+  );
 }

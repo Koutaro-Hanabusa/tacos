@@ -11,6 +11,7 @@ export default function Header() {
   return (
     <div>
       <div className="flex flex-row items-center justify-between px-2 py-1">
+        <div>Tacos de Burio</div>
         <nav className="flex gap-4 text-lg">
           {links.map(({ to, label }) => {
             return (
