@@ -1,7 +1,9 @@
 {
   "plugins": null,
   "categories": {},
-  "rules": {},
+  "rules": {
+    "typescript/triple-slash-reference": "off"
+  },
   "settings": {
     "jsx-a11y": {
       "polymorphicPropName": null,
@@ -35,5 +37,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": []
+  "ignorePatterns": ["**/routeTree.gen.ts"]
 }
