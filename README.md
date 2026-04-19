@@ -1,86 +1,80 @@
 # tacos
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, TRPC, and more.
+TypeScript monorepo for tacos — React frontend + Hono/tRPC backend on Cloudflare Workers.
 
-## Features
+## Stack
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **shadcn/ui** - Reusable UI components
-- **Hono** - Lightweight, performant server framework
-- **tRPC** - End-to-end type-safe APIs
-- **workers** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **SQLite/Turso** - Database engine
-- **Husky** - Git hooks for code quality
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **Turborepo** - Optimized monorepo build system
+- **TypeScript** — type-safe across the stack
+- **TanStack Router** — file-based routing with full type safety
+- **TailwindCSS + shadcn/ui** — styling and UI components
+- **Hono + tRPC** — lightweight API with end-to-end type safety
+- **Cloudflare Workers** — runtime for both web and server apps
+- **Drizzle ORM + Cloudflare D1 (SQLite)** — database layer
+- **Alchemy** — infrastructure-as-code for Cloudflare resources
+- **Turborepo** — monorepo task orchestration
+- **Oxlint + Oxfmt** — linting and formatting
+- **Husky + lint-staged** — Git hooks
 
 ## Getting Started
 
-First, install the dependencies:
+Install dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
 ## Database Setup
 
-This project uses SQLite with Drizzle ORM.
+This project uses Cloudflare D1 (SQLite) with Drizzle ORM. D1 local development and migrations are handled automatically by Alchemy during dev and deploy.
 
-1. Start the local SQLite database (optional):
-   D1 local development and migrations are handled automatically by Alchemy during dev and deploy.
-
-2. Update your `.env` file in the `apps/server` directory with the appropriate connection details if needed.
-
-3. Apply the schema to your database:
+Apply the schema:
 
 ```bash
-bun run db:push
+pnpm run db:push
 ```
 
-Then, run the development server:
+Run the development server:
 
 ```bash
-bun run dev
+pnpm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-The API is running at [http://localhost:3000](http://localhost:3000).
+- Web: [http://localhost:3001](http://localhost:3001)
+- API: [http://localhost:3000](http://localhost:3000)
 
 ## Deployment (Cloudflare via Alchemy)
 
-- Dev: bun run dev
-- Deploy: bun run deploy
-- Destroy: bun run destroy
-
-For more details, see the guide on [Deploying to Cloudflare with Alchemy](https://www.better-t-stack.dev/docs/guides/cloudflare-alchemy).
+- Dev: `pnpm run dev`
+- Deploy: `pnpm run deploy`
+- Destroy: `pnpm run destroy`
 
 ## Git Hooks and Formatting
 
-- Initialize hooks: `bun run prepare`
-- Format and lint fix: `bun run check`
+- Initialize hooks: `pnpm run prepare`
+- Format and lint fix: `pnpm run check`
 
 ## Project Structure
 
 ```
 tacos/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
-│   └── server/      # Backend API (Hono, TRPC)
-├── packages/
-│   ├── api/         # API layer / business logic
-│   └── db/          # Database schema & queries
+│   ├── web/         # Frontend (React + TanStack Router)
+│   └── server/      # Backend (Hono + tRPC on Workers)
+└── packages/
+    ├── api/         # tRPC routers / business logic
+    ├── db/          # Drizzle schema & queries
+    ├── env/         # Env var schema (zod)
+    ├── config/      # Shared TS config
+    └── infra/       # Alchemy (Cloudflare) deployment
 ```
 
 ## Available Scripts
 
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run dev:server`: Start only the server
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run db:push`: Push schema changes to database
-- `bun run db:generate`: Generate database client/types
-- `bun run check`: Run Oxlint and Oxfmt
+- `pnpm run dev` — start all apps in development mode
+- `pnpm run build` — build all apps
+- `pnpm run dev:web` — start only the web app
+- `pnpm run dev:server` — start only the server
+- `pnpm run check-types` — type-check across all packages
+- `pnpm run db:push` — push schema changes to the database
+- `pnpm run db:generate` — generate migrations
+- `pnpm run check` — run Oxlint and Oxfmt
