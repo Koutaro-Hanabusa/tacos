@@ -3,7 +3,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsdown",
+    "build": "vp pack",
     "check-types": "tsc -b"
   },
   "dependencies": {
@@ -21,8 +21,8 @@
     "@tacos/config": "workspace:*",
     "@types/node": "catalog:",
     "alchemy": "catalog:",
-    "tsdown": "^0.16.5",
     "typescript": "catalog:",
+    "vite-plus": "catalog:",
     "wrangler": "^4.54.0"
   }
 }
