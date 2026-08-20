@@ -11,16 +11,14 @@ TypeScript monorepo for tacos — React frontend + Hono/tRPC backend on Cloudfla
 - **Cloudflare Workers** — runtime for both web and server apps
 - **Drizzle ORM + Cloudflare D1 (SQLite)** — database layer
 - **Alchemy** — infrastructure-as-code for Cloudflare resources
-- **Turborepo** — monorepo task orchestration
-- **Oxlint + Oxfmt** — linting and formatting
-- **Husky + lint-staged** — Git hooks
+- **Vite+** — package management, tasks, build, test, lint, and formatting
 
 ## Getting Started
 
 Install dependencies:
 
 ```bash
-pnpm install
+vp install
 ```
 
 ## Database Setup
@@ -30,28 +28,31 @@ This project uses Cloudflare D1 (SQLite) with Drizzle ORM. D1 local development 
 Apply the schema:
 
 ```bash
-pnpm run db:push
+vp run db:push
 ```
 
 Run the development server:
 
 ```bash
-pnpm run dev
+vp run dev
 ```
 
-- Web: [http://localhost:3001](http://localhost:3001)
-- API: [http://localhost:3000](http://localhost:3000)
+- Web: [http://localhost:3011](http://localhost:3011)
+- API: [http://localhost:3010](http://localhost:3010)
+- MCP: [http://localhost:3012/mcp](http://localhost:3012/mcp)
+
+ローカルの `/admin` は Cloudflare Access と `ADMIN_EMAIL` なしで利用できます。
 
 ## Deployment (Cloudflare via Alchemy)
 
 - Dev: `pnpm run dev`
-- Deploy: `pnpm run deploy`
-- Destroy: `pnpm run destroy`
+- Deploy: `vp run --filter @tacos/infra deploy --stage production`
+- Destroy: `vp run destroy`
 
 ## Git Hooks and Formatting
 
-- Initialize hooks: `pnpm run prepare`
-- Format and lint fix: `pnpm run check`
+- Check format, lint, and types: `vp check`
+- Run tests: `vp test`
 
 ## Project Structure
 
@@ -59,9 +60,10 @@ pnpm run dev
 tacos/
 ├── apps/
 │   ├── web/         # Frontend (React + TanStack Router)
-│   └── server/      # Backend (Hono + tRPC on Workers)
+│   ├── server/      # Backend (Hono + tRPC on Workers)
+│   └── mcp/         # MCP server (Hono + @hono/mcp on Workers)
 └── packages/
-    ├── api/         # tRPC routers / business logic
+    ├── api/         # tRPC routers / business logic / RestaurantApi
     ├── db/          # Drizzle schema & queries
     ├── env/         # Env var schema (zod)
     ├── config/      # Shared TS config
@@ -70,11 +72,13 @@ tacos/
 
 ## Available Scripts
 
-- `pnpm run dev` — start all apps in development mode
-- `pnpm run build` — build all apps
-- `pnpm run dev:web` — start only the web app
-- `pnpm run dev:server` — start only the server
-- `pnpm run check-types` — type-check across all packages
-- `pnpm run db:push` — push schema changes to the database
-- `pnpm run db:generate` — generate migrations
-- `pnpm run check` — run Oxlint and Oxfmt
+- `vp run dev` — start all apps in development mode
+- `vp run build` — build all apps
+- `vp run dev:web` — start only the web app
+- `vp run dev:server` — start only the server
+- `vp run dev:mcp` — start only the MCP server (port 3012)
+- `vp run check-types` — type-check across all packages
+- `vp run db:push` — push schema changes to the database
+- `vp run db:generate` — generate migrations
+- `vp check` — check formatting, lint, and TypeScript
+- `vp test` — run tests
