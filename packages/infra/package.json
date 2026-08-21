@@ -5,7 +5,9 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "ci:bootstrap": "alchemy deploy stacks/github.ts --stage production --profile admin",
+    "predev": "vp run --filter mcp build:app",
     "dev": "alchemy dev",
+    "predeploy": "vp run --filter mcp build:app",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy"
   },

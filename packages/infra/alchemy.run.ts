@@ -29,6 +29,7 @@ const loadAppEnvironment = (isDev: boolean) => {
   const appEnvFile = isDev ? ".env.local" : ".env";
   config({ path: `../../apps/web/${appEnvFile}`, override: isDev });
   config({ path: `../../apps/server/${appEnvFile}`, override: isDev });
+  config({ path: `../../apps/mcp/${appEnvFile}`, override: isDev });
 };
 
 const physicalName = (id: string, stage: string) => `tacos-${id}-${stage}`;
@@ -110,6 +111,7 @@ const mcp = Cloudflare.Worker(
   "mcp",
   Effect.gen(function* () {
     const { stage, isDev } = yield* stackRuntime;
+    loadAppEnvironment(isDev);
     return {
       name: physicalName("mcp", stage),
       main: "../../apps/mcp/src/index.ts",
@@ -118,6 +120,9 @@ const mcp = Cloudflare.Worker(
       },
       env: {
         DB: database,
+        GOOGLE_MAPS_EMBED_API_KEY: isDev
+          ? (process.env.GOOGLE_MAPS_EMBED_API_KEY ?? "")
+          : requiredEnv("GOOGLE_MAPS_EMBED_API_KEY"),
         PHOTO_URL_BASE: isDev
           ? `http://localhost:${LOCAL_SERVER_PORT}`
           : `https://${PUBLIC_HOSTNAME}`,

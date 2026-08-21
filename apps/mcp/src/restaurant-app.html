@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="google-maps-embed-api-key" content="__GOOGLE_MAPS_EMBED_API_KEY__" />
+    <title>Tacos restaurant map</title>
+    <link rel="stylesheet" href="./restaurant-app.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Tacos pocket guide</p>
+        <h1>次に行く店を、地図で決める。</h1>
+        <p class="lead">候補の場所をGoogle Mapsで見ながら選べます。</p>
+      </header>
+      <form id="search-form">
+        <label>名前<input id="name" autocomplete="off" placeholder="例: Taqueria" /></label>
+        <label>住所<input id="address" autocomplete="off" placeholder="例: 中目黒" /></label>
+        <button id="search" type="submit">探す</button>
+      </form>
+      <div class="toolbar">
+        <span id="count" aria-live="polite">結果を待っています</span>
+        <button id="refresh" class="secondary" type="button">新着を表示</button>
+      </div>
+      <p id="empty" class="empty">MCPからレストラン情報を受け取ります。</p>
+      <section id="viewer" class="viewer" aria-label="選択したレストランの地図" hidden>
+        <div class="map-frame">
+          <iframe
+            id="map"
+            title="選択したレストランのGoogle Maps"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+          <p id="map-unavailable" class="map-unavailable" hidden>
+            地図を表示できません。Google Mapsで場所を確認してください。
+          </p>
+        </div>
+        <aside class="detail">
+          <h2 id="selected-name"></h2>
+          <p id="selected-address" class="address"></p>
+          <a id="maps-link" class="maps-link" target="_blank" rel="noopener noreferrer">
+            Google Mapsで開く ↗
+          </a>
+        </aside>
+      </section>
+      <div id="places" class="places" aria-label="検索結果のレストラン"></div>
+      <p id="status" role="status">接続しています…</p>
+    </main>
+    <script type="module" src="./restaurant-app-client.js"></script>
+  </body>
+</html>

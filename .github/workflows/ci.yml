@@ -54,6 +54,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+      GOOGLE_MAPS_EMBED_API_KEY: ${{ secrets.GOOGLE_MAPS_EMBED_API_KEY }}
       VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
     steps:
       - name: Checkout
@@ -67,6 +68,9 @@ jobs:
 
       - name: Install dependencies
         run: vp install --frozen-lockfile
+
+      - name: Build MCP App
+        run: vp run --filter mcp build:app
 
       - name: Plan production deployment
         run: >-
