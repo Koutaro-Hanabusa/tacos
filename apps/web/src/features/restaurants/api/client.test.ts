@@ -5,7 +5,7 @@ vi.mock("@tacos/env/web", () => ({
   env: { VITE_SERVER_URL: "https://api.example.test" },
 }));
 
-import { deleteRestaurant, geocodeAddress, registerRestaurant } from "./restaurants";
+import { deleteRestaurant, geocodeAddress, listRestaurants, registerRestaurant } from "./client";
 
 const fetchMock = vi.fn();
 
@@ -42,6 +42,15 @@ afterEach(() => {
 });
 
 describe("restaurant API client", () => {
+  it("登録済みのお店を検証して返す", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ restaurants: [restaurant] }));
+
+    await expect(listRestaurants()).resolves.toEqual([restaurant]);
+    expect(fetchMock).toHaveBeenCalledWith("https://api.example.test/api/restaurants", {
+      headers: { Accept: "application/json" },
+    });
+  });
+
   it("住所検索の座標を検証して返す", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ latitude: 35.671, longitude: 139.706 }));
 

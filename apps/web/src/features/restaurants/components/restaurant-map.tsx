@@ -1,45 +1,49 @@
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
-export interface MapMarker {
+export interface RestaurantMarker {
   id: number;
   name: string;
   latitude: number;
   longitude: number;
 }
 
-interface TacoMapProps {
-  markers: MapMarker[];
+interface RestaurantMapProps {
+  markers: RestaurantMarker[];
   selectedId?: number;
   onSelect?: (id: number) => void;
+}
+
+interface MarkerReference {
+  element: HTMLButtonElement;
+  marker: maplibregl.Marker;
 }
 
 const DEFAULT_CENTER: [number, number] = [139.6503, 35.6762];
 const DEFAULT_ZOOM = 12;
 
-function createRestaurantMarker(
-  marker: MapMarker,
-  selected: boolean,
+function createMarkerElement(
+  marker: RestaurantMarker,
   onSelect: ((id: number) => void) | undefined,
 ) {
   const element = document.createElement("button");
   element.type = "button";
   element.className = "restaurant-map-marker";
-  element.dataset.selected = selected ? "true" : "false";
   element.setAttribute("aria-label", `${marker.name}を選択`);
   element.title = marker.name;
+  element.onclick = () => onSelect?.(marker.id);
+
   const label = document.createElement("span");
   label.textContent = "T";
   element.append(label);
-  element.addEventListener("click", () => onSelect?.(marker.id));
 
   return element;
 }
 
-export function TacoMap({ markers, selectedId, onSelect }: TacoMapProps) {
+export function RestaurantMap({ markers, selectedId, onSelect }: RestaurantMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const markerRefs = useRef<maplibregl.Marker[]>([]);
+  const markerRefs = useRef(new Map<number, MarkerReference>());
   const didFitInitialMarkers = useRef(false);
 
   useEffect(() => {
@@ -76,8 +80,8 @@ export function TacoMap({ markers, selectedId, onSelect }: TacoMapProps) {
     mapRef.current = map;
 
     return () => {
-      markerRefs.current.forEach((marker) => marker.remove());
-      markerRefs.current = [];
+      markerRefs.current.forEach(({ marker }) => marker.remove());
+      markerRefs.current.clear();
       map.remove();
       mapRef.current = null;
     };
@@ -87,37 +91,56 @@ export function TacoMap({ markers, selectedId, onSelect }: TacoMapProps) {
     const map = mapRef.current;
     if (!map) return;
 
-    markerRefs.current.forEach((marker) => marker.remove());
-    markerRefs.current = markers.map((marker) => {
-      return new maplibregl.Marker({
-        element: createRestaurantMarker(marker, marker.id === selectedId, onSelect),
-        anchor: "bottom",
-      })
-        .setLngLat([marker.longitude, marker.latitude])
-        .addTo(map);
+    const nextIds = new Set(markers.map((marker) => marker.id));
+    markerRefs.current.forEach((reference, id) => {
+      if (nextIds.has(id)) return;
+
+      reference.marker.remove();
+      markerRefs.current.delete(id);
     });
 
-    if (markers.length > 0 && !didFitInitialMarkers.current) {
-      didFitInitialMarkers.current = true;
-
-      if (markers.length === 1) {
-        const marker = markers[0];
-        if (marker) map.jumpTo({ center: [marker.longitude, marker.latitude], zoom: 14 });
-      } else {
-        const bounds = markers.reduce(
-          (currentBounds, marker) => currentBounds.extend([marker.longitude, marker.latitude]),
-          new maplibregl.LngLatBounds(
-            [markers[0]?.longitude ?? DEFAULT_CENTER[0], markers[0]?.latitude ?? DEFAULT_CENTER[1]],
-            [markers[0]?.longitude ?? DEFAULT_CENTER[0], markers[0]?.latitude ?? DEFAULT_CENTER[1]],
-          ),
-        );
-
-        map.fitBounds(bounds, { duration: 0, maxZoom: 14, padding: 72 });
+    markers.forEach((marker) => {
+      const existing = markerRefs.current.get(marker.id);
+      if (existing) {
+        existing.element.setAttribute("aria-label", `${marker.name}を選択`);
+        existing.element.title = marker.name;
+        existing.element.onclick = () => onSelect?.(marker.id);
+        existing.marker.setLngLat([marker.longitude, marker.latitude]);
+        return;
       }
+
+      const element = createMarkerElement(marker, onSelect);
+      const mapMarker = new maplibregl.Marker({ element, anchor: "bottom" })
+        .setLngLat([marker.longitude, marker.latitude])
+        .addTo(map);
+      markerRefs.current.set(marker.id, { element, marker: mapMarker });
+    });
+
+    if (markers.length === 0 || didFitInitialMarkers.current) return;
+    didFitInitialMarkers.current = true;
+
+    if (markers.length === 1) {
+      const marker = markers[0];
+      if (marker) map.jumpTo({ center: [marker.longitude, marker.latitude], zoom: 14 });
+      return;
     }
-  }, [markers, onSelect, selectedId]);
+
+    const firstMarker = markers[0];
+    const bounds = markers.reduce(
+      (currentBounds, marker) => currentBounds.extend([marker.longitude, marker.latitude]),
+      new maplibregl.LngLatBounds(
+        [firstMarker?.longitude ?? DEFAULT_CENTER[0], firstMarker?.latitude ?? DEFAULT_CENTER[1]],
+        [firstMarker?.longitude ?? DEFAULT_CENTER[0], firstMarker?.latitude ?? DEFAULT_CENTER[1]],
+      ),
+    );
+    map.fitBounds(bounds, { duration: 0, maxZoom: 14, padding: 72 });
+  }, [markers, onSelect]);
 
   useEffect(() => {
+    markerRefs.current.forEach(({ element }, id) => {
+      element.dataset.selected = id === selectedId ? "true" : "false";
+    });
+
     if (selectedId === undefined) return;
 
     const marker = markers.find((candidate) => candidate.id === selectedId);
