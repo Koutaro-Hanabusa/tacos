@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, type Plugin } from "vite-plus";
 import { viteSingleFile } from "vite-plugin-singlefile";
 
@@ -30,7 +31,7 @@ function emitHtmlModule(): Plugin {
 export default defineConfig({
   root: resolve(import.meta.dirname, "src"),
   // vite-plugin-singlefile exposes Vite's Plugin type, while Vite+ wraps its own copy.
-  plugins: [viteSingleFile() as unknown as Plugin, emitHtmlModule()],
+  plugins: [tailwindcss(), viteSingleFile() as unknown as Plugin, emitHtmlModule()],
   build: {
     outDir: "../dist/app",
     emptyOutDir: false,
