@@ -45,9 +45,26 @@ vp run dev
 
 ## Deployment (Cloudflare via Alchemy)
 
-- Dev: `pnpm run dev`
+- Dev: `vp run dev`
 - Deploy: `vp run --filter @tacos/infra deploy --stage production`
 - Destroy: `vp run destroy`
+
+`main` への push は、GitHub Actions で check・型検査・test・build が通った後に
+Alchemy の dry-run と production deploy を順に実行します。production Environment は
+`main` からのデプロイだけを許可します。
+
+CI 用の Cloudflare API token と GitHub Actions の設定は Alchemy で管理します。
+初回と権限変更時だけ、API Tokens の作成権限を持つ admin profile で次を実行します。
+
+```bash
+vp exec --filter @tacos/infra -- alchemy login --profile admin
+vp run ci:bootstrap
+```
+
+`ci:bootstrap` は production Environment、Cloudflare の CI 専用 token、
+`CLOUDFLARE_API_TOKEN`・`CLOUDFLARE_ACCOUNT_ID`・`ADMIN_EMAIL`、および公開設定の
+`VITE_SERVER_URL`・`CORS_ORIGIN` を GitHub に登録します。admin profile は bootstrap
+専用とし、通常のデプロイには使用しません。
 
 ## Git Hooks and Formatting
 

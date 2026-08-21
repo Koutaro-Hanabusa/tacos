@@ -12,6 +12,7 @@
     "dev:mcp": "vp run --filter @tacos/infra dev",
     "db:push": "vp run --filter @tacos/db db:push",
     "db:generate": "vp run --filter @tacos/db db:generate",
+    "ci:bootstrap": "vp run --filter @tacos/infra ci:bootstrap",
     "deploy": "vp run --filter @tacos/infra deploy",
     "destroy": "vp run --filter @tacos/infra destroy",
     "check": "vp lint && vp fmt --write",
