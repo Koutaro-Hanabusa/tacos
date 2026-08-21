@@ -26,7 +26,12 @@ function restaurantAppMeta(photoUrlBase: string) {
   return {
     ui: {
       csp: {
-        resourceDomains: ["https://esm.sh", new URL(photoUrlBase).origin],
+        resourceDomains: [
+          "https://esm.sh",
+          "https://cdn.jsdelivr.net",
+          "https://tile.openstreetmap.org",
+          new URL(photoUrlBase).origin,
+        ],
       },
       prefersBorder: true,
     },
@@ -73,10 +78,10 @@ function createMcpServer(db: Db, photoUrlBase: string) {
 
   registerAppResource(
     server,
-    "Tacos restaurant browser",
+    "Tacos restaurant map",
     RESTAURANT_APP_RESOURCE_URI,
     {
-      description: "レストランの検索結果をカード形式で操作する MCP App",
+      description: "レストランの検索結果を地図で操作する MCP App",
       mimeType: RESOURCE_MIME_TYPE,
       _meta: appMeta,
     },
