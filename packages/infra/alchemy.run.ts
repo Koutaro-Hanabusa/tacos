@@ -120,9 +120,6 @@ const mcp = Cloudflare.Worker(
       },
       env: {
         DB: database,
-        GOOGLE_MAPS_EMBED_API_KEY: isDev
-          ? (process.env.GOOGLE_MAPS_EMBED_API_KEY ?? "")
-          : requiredEnv("GOOGLE_MAPS_EMBED_API_KEY"),
         PHOTO_URL_BASE: isDev
           ? `http://localhost:${LOCAL_SERVER_PORT}`
           : `https://${PUBLIC_HOSTNAME}`,

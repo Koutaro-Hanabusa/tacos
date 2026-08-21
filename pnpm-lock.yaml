@@ -109,6 +109,9 @@ importers:
       hono:
         specifier: 'catalog:'
         version: 4.12.14
+      maplibre-gl:
+        specifier: ^5.23.0
+        version: 5.23.0
       zod:
         specifier: 'catalog:'
         version: 4.3.6

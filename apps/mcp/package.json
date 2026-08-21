@@ -16,6 +16,7 @@
     "@tacos/env": "workspace:*",
     "drizzle-orm": "^0.45.2",
     "hono": "catalog:",
+    "maplibre-gl": "^5.23.0",
     "zod": "catalog:"
   },
   "devDependencies": {

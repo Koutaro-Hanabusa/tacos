@@ -4,8 +4,11 @@ import {
   applyDocumentTheme,
   applyHostStyleVariables,
 } from "@modelcontextprotocol/ext-apps";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-const apiKey = document.querySelector('meta[name="google-maps-embed-api-key"]')?.content || "";
+const DEFAULT_CENTER = [139.6503, 35.6762];
+const DEFAULT_ZOOM = 12;
 const nameInput = document.getElementById("name");
 const addressInput = document.getElementById("address");
 const form = document.getElementById("search-form");
@@ -15,15 +18,18 @@ const count = document.getElementById("count");
 const status = document.getElementById("status");
 const empty = document.getElementById("empty");
 const viewer = document.getElementById("viewer");
-const map = document.getElementById("map");
+const mapContainer = document.getElementById("map");
 const mapUnavailable = document.getElementById("map-unavailable");
 const selectedName = document.getElementById("selected-name");
 const selectedAddress = document.getElementById("selected-address");
 const mapsLink = document.getElementById("maps-link");
 const places = document.getElementById("places");
 const app = new App({ name: "Tacos restaurant map", version: "0.1.0" });
+const markerReferences = new Map();
 let restaurants = [];
 let selectedId = null;
+let mapInstance = null;
+let mapInitializationFailed = false;
 
 const text = (value) => (value === null || value === undefined ? "" : String(value));
 
@@ -52,18 +58,135 @@ function safeGoogleMapsUrl(value) {
   }
 }
 
-function embedUrl(restaurant) {
-  if (!apiKey) return null;
-  const url = new URL("https://www.google.com/maps/embed/v1/place");
-  url.searchParams.set("key", apiKey);
-  url.searchParams.set(
-    "q",
-    [text(restaurant.name), text(restaurant.address)].filter(Boolean).join(", "),
-  );
-  return url.toString();
+function coordinates(restaurant) {
+  const longitude = Number(restaurant.longitude);
+  const latitude = Number(restaurant.latitude);
+  return Number.isFinite(longitude) && Number.isFinite(latitude) ? { longitude, latitude } : null;
 }
 
-function renderSelected() {
+function createMarkerElement(restaurant) {
+  const element = document.createElement("button");
+  element.type = "button";
+  element.className = "restaurant-map-marker";
+  element.setAttribute("aria-label", `${text(restaurant.name) || "名前のないレストラン"}を選択`);
+  element.title = text(restaurant.name) || "名前のないレストラン";
+  element.addEventListener("click", () => selectRestaurant(restaurant.id));
+
+  const pin = document.createElement("span");
+  pin.className = "restaurant-map-pin";
+  const label = document.createElement("span");
+  label.textContent = "T";
+  pin.append(label);
+  element.append(pin);
+  return element;
+}
+
+function ensureMap() {
+  if (mapInstance || mapInitializationFailed) return mapInstance;
+
+  try {
+    mapInstance = new maplibregl.Map({
+      container: mapContainer,
+      style: {
+        version: 8,
+        sources: {
+          osm: {
+            type: "raster",
+            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+            tileSize: 256,
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          },
+        },
+        layers: [
+          {
+            id: "osm-tiles",
+            type: "raster",
+            source: "osm",
+            minzoom: 0,
+            maxzoom: 19,
+          },
+        ],
+      },
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
+      maxZoom: 19,
+    });
+    mapInstance.addControl(new maplibregl.NavigationControl(), "top-right");
+    let mapIsUsable = false;
+    mapInstance.on("idle", () => {
+      mapIsUsable = true;
+      mapUnavailable.hidden = markerReferences.size > 0;
+    });
+    mapInstance.on("error", () => {
+      if (!mapIsUsable) mapUnavailable.hidden = false;
+    });
+    mapContainer.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) return;
+      const link = event.target.closest(".maplibregl-ctrl-attrib a, .maplibregl-ctrl-logo");
+      if (!(link instanceof HTMLAnchorElement) || !link.href.startsWith("https://")) return;
+      event.preventDefault();
+      void app.openLink({ url: link.href });
+    });
+  } catch {
+    mapInitializationFailed = true;
+    mapContainer.hidden = true;
+    mapUnavailable.hidden = false;
+  }
+
+  return mapInstance;
+}
+
+function removeMarkers() {
+  markerReferences.forEach(({ marker }) => marker.remove());
+  markerReferences.clear();
+}
+
+function syncMarkers() {
+  const map = ensureMap();
+  removeMarkers();
+
+  const mappableRestaurants = restaurants
+    .map((restaurant) => ({ restaurant, coordinates: coordinates(restaurant) }))
+    .filter(({ coordinates: value }) => value !== null);
+
+  mapContainer.hidden = !map || mappableRestaurants.length === 0;
+  mapUnavailable.hidden = Boolean(map && mappableRestaurants.length > 0);
+  if (!map) return [];
+
+  for (const { restaurant, coordinates: position } of mappableRestaurants) {
+    const element = createMarkerElement(restaurant);
+    const marker = new maplibregl.Marker({ element, anchor: "bottom" })
+      .setLngLat([position.longitude, position.latitude])
+      .addTo(map);
+    markerReferences.set(String(restaurant.id), { element, marker });
+  }
+
+  return mappableRestaurants;
+}
+
+function fitRestaurants(mappableRestaurants) {
+  if (!mapInstance || mappableRestaurants.length === 0) return;
+
+  if (mappableRestaurants.length === 1) {
+    const position = mappableRestaurants[0].coordinates;
+    mapInstance.jumpTo({ center: [position.longitude, position.latitude], zoom: 14 });
+    return;
+  }
+
+  const firstPosition = mappableRestaurants[0].coordinates;
+  const bounds = mappableRestaurants.reduce(
+    (currentBounds, { coordinates: position }) =>
+      currentBounds.extend([position.longitude, position.latitude]),
+    new maplibregl.LngLatBounds(
+      [firstPosition.longitude, firstPosition.latitude],
+      [firstPosition.longitude, firstPosition.latitude],
+    ),
+  );
+  mapInstance.fitBounds(bounds, { duration: 0, maxZoom: 14, padding: 72 });
+}
+
+function renderSelected({ moveMap = false } = {}) {
   const restaurant = restaurants.find((item) => String(item.id) === String(selectedId));
   if (!restaurant) return;
 
@@ -73,28 +196,32 @@ function renderSelected() {
   const externalUrl = safeGoogleMapsUrl(restaurant.googleMapsUrl);
   mapsLink.hidden = !externalUrl;
   if (externalUrl) mapsLink.href = externalUrl;
+  else mapsLink.removeAttribute("href");
 
-  const embeddedUrl = embedUrl(restaurant);
-  map.hidden = !embeddedUrl;
-  mapUnavailable.hidden = Boolean(embeddedUrl);
-  if (embeddedUrl) {
-    map.title = selectedName.textContent + "のGoogle Maps";
-    map.src = embeddedUrl;
-  } else {
-    map.removeAttribute("src");
-  }
-
+  markerReferences.forEach(({ element }, id) => {
+    element.dataset.selected = String(id) === String(selectedId) ? "true" : "false";
+  });
   places.querySelectorAll(".place").forEach((button) => {
     button.setAttribute(
       "aria-pressed",
       String(button.dataset.id) === String(selectedId) ? "true" : "false",
     );
   });
+
+  const position = coordinates(restaurant);
+  if (moveMap && position && mapInstance) {
+    mapInstance.flyTo({
+      center: [position.longitude, position.latitude],
+      duration: 700,
+      essential: true,
+      zoom: Math.max(mapInstance.getZoom(), 15),
+    });
+  }
 }
 
 function selectRestaurant(id) {
   selectedId = id;
-  renderSelected();
+  renderSelected({ moveMap: true });
 }
 
 function render(payload) {
@@ -107,7 +234,7 @@ function render(payload) {
   if (restaurants.length === 0) {
     selectedId = null;
     empty.textContent = "条件に合う店はまだありません。検索条件を変えてみてください。";
-    map.removeAttribute("src");
+    removeMarkers();
     return;
   }
 
@@ -126,7 +253,10 @@ function render(payload) {
     }
   }
 
+  const mappableRestaurants = syncMarkers();
+  fitRestaurants(mappableRestaurants);
   renderSelected();
+  requestAnimationFrame(() => mapInstance?.resize());
 }
 
 function searchArguments() {
@@ -174,10 +304,13 @@ app.ontoolresult = (result) => {
 app.onhostcontextchanged = (context) => {
   if (context.theme) applyDocumentTheme(context.theme);
   if (context.styles?.variables) applyHostStyleVariables(context.styles.variables);
+  requestAnimationFrame(() => mapInstance?.resize());
 };
 
 app.onteardown = () => {
-  map.src = "about:blank";
+  removeMarkers();
+  mapInstance?.remove();
+  mapInstance = null;
   return {};
 };
 
