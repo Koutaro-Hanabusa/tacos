@@ -12,8 +12,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "catalog:",
     "@tacos/config": "workspace:*",
     "alchemy": "catalog:",
+    "effect": "catalog:",
     "typescript": "catalog:"
   }
 }

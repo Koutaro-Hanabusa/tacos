@@ -20,6 +20,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@tacos/config": "workspace:*",
     "hono": "catalog:",
     "typescript": "catalog:"

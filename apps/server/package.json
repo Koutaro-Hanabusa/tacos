@@ -21,7 +21,6 @@
     "@cloudflare/workers-types": "catalog:",
     "@tacos/config": "workspace:*",
     "@types/node": "catalog:",
-    "alchemy": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "wrangler": "^4.54.0"

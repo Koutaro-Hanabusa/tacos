@@ -25,6 +25,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@tacos/config": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "typescript": "catalog:"
