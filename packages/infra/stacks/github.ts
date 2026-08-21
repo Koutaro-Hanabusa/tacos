@@ -45,9 +45,8 @@ export default Alchemy.Stack(
       return yield* Effect.die("Account-scoped Access Apps and Policies permission was not found");
     }
 
-    const ciToken = yield* Cloudflare.ApiToken.AccountApiToken("ci-token", {
+    const ciToken = yield* Cloudflare.ApiToken.UserApiToken("ci-token", {
       name: "tacos-github-actions",
-      accountId,
       policies: [
         {
           effect: "allow",
