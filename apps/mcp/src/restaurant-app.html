@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="google-maps-embed-api-key" content="__GOOGLE_MAPS_EMBED_API_KEY__" />
     <title>Tacos restaurant map</title>
     <link rel="stylesheet" href="./restaurant-app.css" />
   </head>
@@ -12,7 +11,7 @@
       <header>
         <p class="eyebrow">Tacos pocket guide</p>
         <h1>次に行く店を、地図で決める。</h1>
-        <p class="lead">候補の場所をGoogle Mapsで見ながら選べます。</p>
+        <p class="lead">候補の場所を地図で見ながら選べます。</p>
       </header>
       <form id="search-form">
         <label>名前<input id="name" autocomplete="off" placeholder="例: Taqueria" /></label>
@@ -26,13 +25,7 @@
       <p id="empty" class="empty">MCPからレストラン情報を受け取ります。</p>
       <section id="viewer" class="viewer" aria-label="選択したレストランの地図" hidden>
         <div class="map-frame">
-          <iframe
-            id="map"
-            title="選択したレストランのGoogle Maps"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          ></iframe>
+          <div id="map" role="region" aria-label="レストラン地図"></div>
           <p id="map-unavailable" class="map-unavailable" hidden>
             地図を表示できません。Google Mapsで場所を確認してください。
           </p>

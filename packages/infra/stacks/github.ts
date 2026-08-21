@@ -109,14 +109,6 @@ export default Alchemy.Stack(
       value: Redacted.make(requiredEnv("ADMIN_EMAIL")),
     });
 
-    yield* GitHub.Secret("google-maps-embed-api-key", {
-      owner: GITHUB_OWNER,
-      repository: GITHUB_REPOSITORY,
-      environment: production,
-      name: "GOOGLE_MAPS_EMBED_API_KEY",
-      value: Redacted.make(requiredEnv("GOOGLE_MAPS_EMBED_API_KEY")),
-    });
-
     yield* GitHub.Variable("vite-server-url", {
       owner: GITHUB_OWNER,
       repository: GITHUB_REPOSITORY,

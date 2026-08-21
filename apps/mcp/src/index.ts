@@ -19,14 +19,14 @@ import { RESTAURANT_APP_RESOURCE_URI, restaurantAppHtml } from "./restaurant-app
 
 type Bindings = {
   DB: D1Database;
-  GOOGLE_MAPS_EMBED_API_KEY: string;
   PHOTO_URL_BASE: string;
 };
 
 function restaurantAppResourceMeta() {
   return {
     csp: {
-      frameDomains: ["https://www.google.com"],
+      connectDomains: ["https://tile.openstreetmap.org"],
+      resourceDomains: ["https://tile.openstreetmap.org"],
     },
     prefersBorder: true,
   };
@@ -65,7 +65,7 @@ function restaurantResult(
   };
 }
 
-function createMcpServer(db: Db, photoUrlBase: string, googleMapsEmbedApiKey: string) {
+function createMcpServer(db: Db, photoUrlBase: string) {
   const api = new RestaurantApi(db, { photoUrlBase });
   const server = new McpServer({ name: "tacos", version: "0.1.0" });
   const appResourceMeta = restaurantAppResourceMeta();
@@ -75,7 +75,7 @@ function createMcpServer(db: Db, photoUrlBase: string, googleMapsEmbedApiKey: st
     "Tacos restaurant map",
     RESTAURANT_APP_RESOURCE_URI,
     {
-      description: "レストランの検索結果をGoogle Mapsで表示する MCP App",
+      description: "レストランの検索結果を地図で表示する MCP App",
       mimeType: RESOURCE_MIME_TYPE,
       _meta: { ui: appResourceMeta },
     },
@@ -84,7 +84,7 @@ function createMcpServer(db: Db, photoUrlBase: string, googleMapsEmbedApiKey: st
         {
           uri: RESTAURANT_APP_RESOURCE_URI,
           mimeType: RESOURCE_MIME_TYPE,
-          text: restaurantAppHtml.replace("__GOOGLE_MAPS_EMBED_API_KEY__", googleMapsEmbedApiKey),
+          text: restaurantAppHtml,
           // Inspector 2.3 reads resource CSP directly, while other hosts use the namespaced form.
           _meta: { ...appResourceMeta, ui: appResourceMeta },
         },
@@ -139,11 +139,7 @@ function createMcpServer(db: Db, photoUrlBase: string, googleMapsEmbedApiKey: st
 app.get("/", (c) => c.text("tacos mcp"));
 
 app.all("/mcp", async (c) => {
-  const server = createMcpServer(
-    drizzle(c.env.DB, { schema }),
-    c.env.PHOTO_URL_BASE,
-    c.env.GOOGLE_MAPS_EMBED_API_KEY ?? "",
-  );
+  const server = createMcpServer(drizzle(c.env.DB, { schema }), c.env.PHOTO_URL_BASE);
   const transport = new StreamableHTTPTransport();
 
   await server.connect(transport);
