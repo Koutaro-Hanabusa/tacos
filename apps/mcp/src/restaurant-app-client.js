@@ -5,24 +5,23 @@ import {
   applyHostStyleVariables,
 } from "@modelcontextprotocol/ext-apps";
 import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
 
 const DEFAULT_CENTER = [139.6503, 35.6762];
 const DEFAULT_ZOOM = 12;
-const nameInput = document.getElementById("name");
-const addressInput = document.getElementById("address");
-const form = document.getElementById("search-form");
-const searchButton = document.getElementById("search");
-const refreshButton = document.getElementById("refresh");
+const PLACE_BASE_CLASS = "place group w-full border transition-colors";
+const PLACE_DEFAULT_CLASS =
+  "border-[#c7854b]/40 bg-[#fdf1d7]/55 hover:border-[#a84322]/70 hover:bg-[#fff4dc] dark:border-[#743f27] dark:bg-[#2a120a]/60 dark:hover:bg-[#35170d]";
+const PLACE_SELECTED_CLASS =
+  "border-[#a84322] bg-[#fff4dc] shadow-[3px_3px_0_rgb(135_51_24_/_0.28)] dark:bg-[#3b180d]";
+const PLACE_BUTTON_CLASS =
+  "place-select flex w-full gap-3 p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#a84322]";
+const STATUS_ERROR_CLASS =
+  "m-3 mt-0 border border-dashed border-[#b54220]/50 bg-[#fff4dc]/70 px-3 py-2 text-xs leading-relaxed text-[#8a321b] dark:bg-[#35170d] dark:text-[#ffb192]";
 const count = document.getElementById("count");
 const status = document.getElementById("status");
 const empty = document.getElementById("empty");
-const viewer = document.getElementById("viewer");
 const mapContainer = document.getElementById("map");
 const mapUnavailable = document.getElementById("map-unavailable");
-const selectedName = document.getElementById("selected-name");
-const selectedAddress = document.getElementById("selected-address");
-const mapsLink = document.getElementById("maps-link");
 const places = document.getElementById("places");
 const app = new App({ name: "Tacos restaurant map", version: "0.1.0" });
 const markerReferences = new Map();
@@ -42,6 +41,15 @@ function resultPayload(result) {
     return Array.isArray(parsed) ? { restaurants: parsed } : parsed;
   } catch {
     return { restaurants: [] };
+  }
+}
+
+function safeImageUrl(value) {
+  try {
+    const url = new URL(text(value));
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
+  } catch {
+    return null;
   }
 }
 
@@ -72,12 +80,9 @@ function createMarkerElement(restaurant) {
   element.title = text(restaurant.name) || "名前のないレストラン";
   element.addEventListener("click", () => selectRestaurant(restaurant.id));
 
-  const pin = document.createElement("span");
-  pin.className = "restaurant-map-pin";
   const label = document.createElement("span");
   label.textContent = "T";
-  pin.append(label);
-  element.append(pin);
+  element.append(label);
   return element;
 }
 
@@ -116,7 +121,7 @@ function ensureMap() {
     let mapIsUsable = false;
     mapInstance.on("idle", () => {
       mapIsUsable = true;
-      mapUnavailable.hidden = markerReferences.size > 0;
+      mapUnavailable.hidden = true;
     });
     mapInstance.on("error", () => {
       if (!mapIsUsable) mapUnavailable.hidden = false;
@@ -150,8 +155,8 @@ function syncMarkers() {
     .map((restaurant) => ({ restaurant, coordinates: coordinates(restaurant) }))
     .filter(({ coordinates: value }) => value !== null);
 
-  mapContainer.hidden = !map || mappableRestaurants.length === 0;
-  mapUnavailable.hidden = Boolean(map && mappableRestaurants.length > 0);
+  mapContainer.hidden = !map;
+  mapUnavailable.hidden = Boolean(map);
   if (!map) return [];
 
   for (const { restaurant, coordinates: position } of mappableRestaurants) {
@@ -190,22 +195,13 @@ function renderSelected({ moveMap = false } = {}) {
   const restaurant = restaurants.find((item) => String(item.id) === String(selectedId));
   if (!restaurant) return;
 
-  selectedName.textContent = text(restaurant.name) || "名前のないレストラン";
-  selectedAddress.textContent = text(restaurant.address);
-
-  const externalUrl = safeGoogleMapsUrl(restaurant.googleMapsUrl);
-  mapsLink.hidden = !externalUrl;
-  if (externalUrl) mapsLink.href = externalUrl;
-  else mapsLink.removeAttribute("href");
-
   markerReferences.forEach(({ element }, id) => {
     element.dataset.selected = String(id) === String(selectedId) ? "true" : "false";
   });
-  places.querySelectorAll(".place").forEach((button) => {
-    button.setAttribute(
-      "aria-pressed",
-      String(button.dataset.id) === String(selectedId) ? "true" : "false",
-    );
+  places.querySelectorAll(".place").forEach((place) => {
+    const isSelected = String(place.dataset.id) === String(selectedId);
+    place.querySelector(".place-select")?.setAttribute("aria-pressed", String(isSelected));
+    place.className = `${PLACE_BASE_CLASS} ${isSelected ? PLACE_SELECTED_CLASS : PLACE_DEFAULT_CLASS}`;
   });
 
   const position = coordinates(restaurant);
@@ -224,33 +220,119 @@ function selectRestaurant(id) {
   renderSelected({ moveMap: true });
 }
 
+function createAddressMarker() {
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  icon.setAttribute("aria-hidden", "true");
+  icon.setAttribute("class", "mt-0.5 size-3 shrink-0 text-[#b54220] dark:text-[#ff956b]");
+  icon.setAttribute("fill", "none");
+  icon.setAttribute("stroke", "currentColor");
+  icon.setAttribute("stroke-linecap", "round");
+  icon.setAttribute("stroke-linejoin", "round");
+  icon.setAttribute("stroke-width", "2");
+  icon.setAttribute("viewBox", "0 0 24 24");
+
+  const pin = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pin.setAttribute(
+    "d",
+    "M20 10c0 5-5.5 10.5-7.4 12.3a.9.9 0 0 1-1.2 0C9.5 20.5 4 15 4 10a8 8 0 0 1 16 0",
+  );
+  const center = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  center.setAttribute("cx", "12");
+  center.setAttribute("cy", "10");
+  center.setAttribute("r", "3");
+  icon.append(pin, center);
+  return icon;
+}
+
+function createPlaceElement(restaurant) {
+  const place = document.createElement("article");
+  place.className = `${PLACE_BASE_CLASS} ${PLACE_DEFAULT_CLASS}`;
+  place.dataset.id = text(restaurant.id);
+
+  const button = document.createElement("button");
+  button.className = PLACE_BUTTON_CLASS;
+  button.type = "button";
+  button.addEventListener("click", () => selectRestaurant(restaurant.id));
+
+  const photo = document.createElement("span");
+  photo.className =
+    "grid h-20 w-20 shrink-0 place-items-center overflow-hidden border border-[#b86536]/30 bg-[#f2bd48] font-serif text-xl font-bold text-[#56210e] shadow-[3px_3px_0_rgb(87_32_13_/_0.22)]";
+
+  const image = document.createElement("img");
+  image.alt = `${text(restaurant.name) || "名前のないレストラン"}の写真`;
+  image.className = "size-full object-cover";
+  image.loading = "lazy";
+  const placeholder = document.createElement("span");
+  placeholder.textContent = "T";
+  placeholder.setAttribute("aria-hidden", "true");
+
+  const imageUrl = safeImageUrl(restaurant.photoUrl);
+  image.hidden = !imageUrl;
+  placeholder.hidden = Boolean(imageUrl);
+  if (imageUrl) image.src = imageUrl;
+  image.addEventListener("error", () => {
+    image.hidden = true;
+    placeholder.hidden = false;
+  });
+  photo.append(image, placeholder);
+
+  const content = document.createElement("span");
+  content.className = "min-w-0 flex-1";
+  const name = document.createElement("span");
+  name.className = "block font-serif text-lg leading-tight font-bold tracking-[-0.03em]";
+  name.textContent = text(restaurant.name) || "名前のないレストラン";
+  const address = document.createElement("span");
+  address.className =
+    "mt-2 flex gap-1.5 text-xs leading-relaxed text-[#70432c] dark:text-[#e1ae8a]";
+  const addressMarker = createAddressMarker();
+  const addressText = document.createElement("span");
+  addressText.textContent = text(restaurant.address);
+  address.append(addressMarker, addressText);
+  content.append(name, address);
+  button.append(photo, content);
+
+  place.append(button);
+  const mapsUrl = safeGoogleMapsUrl(restaurant.googleMapsUrl);
+  if (mapsUrl) {
+    const mapsLink = document.createElement("a");
+    mapsLink.className =
+      "mx-3 mb-3 inline-flex min-h-8 items-center border border-[#b86536]/45 bg-[#fff9ec]/70 px-2.5 text-[0.68rem] font-bold text-[#7f351c] no-underline transition-colors hover:bg-[#f8e3b6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a84322] dark:bg-[#190904]/50 dark:text-[#ffb18a] dark:hover:bg-[#4a1c0d]";
+    mapsLink.href = mapsUrl;
+    mapsLink.target = "_blank";
+    mapsLink.rel = "noopener noreferrer";
+    mapsLink.textContent = "Google Mapsで開く ↗";
+    mapsLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      void app.openLink({ url: mapsUrl });
+    });
+    place.append(mapsLink);
+  }
+
+  return place;
+}
+
 function render(payload) {
   restaurants = Array.isArray(payload?.restaurants) ? payload.restaurants : [];
-  count.textContent = restaurants.length + " 件のレストラン";
+  count.textContent = String(restaurants.length);
+  count.setAttribute("aria-label", `${restaurants.length}件のレストラン`);
   places.replaceChildren();
-  empty.hidden = restaurants.length > 0;
-  viewer.hidden = restaurants.length === 0;
 
   if (restaurants.length === 0) {
     selectedId = null;
-    empty.textContent = "条件に合う店はまだありません。検索条件を変えてみてください。";
+    empty.textContent = "条件に合う店はありません。";
+    places.append(empty);
     removeMarkers();
+    const map = ensureMap();
+    map?.jumpTo({ center: DEFAULT_CENTER, zoom: DEFAULT_ZOOM });
+    requestAnimationFrame(() => map?.resize());
     return;
   }
 
   const previous = restaurants.find((item) => String(item.id) === String(selectedId));
   selectedId = (previous || restaurants[0]).id;
 
-  if (restaurants.length > 1) {
-    for (const restaurant of restaurants) {
-      const button = document.createElement("button");
-      button.className = "place";
-      button.type = "button";
-      button.dataset.id = text(restaurant.id);
-      button.textContent = text(restaurant.name) || "名前のないレストラン";
-      button.addEventListener("click", () => selectRestaurant(restaurant.id));
-      places.append(button);
-    }
+  for (const restaurant of restaurants) {
+    places.append(createPlaceElement(restaurant));
   }
 
   const mappableRestaurants = syncMarkers();
@@ -259,53 +341,41 @@ function render(payload) {
   requestAnimationFrame(() => mapInstance?.resize());
 }
 
-function searchArguments() {
-  const args = {};
-  if (nameInput.value.trim()) args.name = nameInput.value.trim();
-  if (addressInput.value.trim()) args.address = addressInput.value.trim();
-  return args;
+function applyHostContext(context) {
+  if (context?.theme) applyDocumentTheme(context.theme);
+  if (context?.styles?.variables) applyHostStyleVariables(context.styles.variables);
+  requestAnimationFrame(() => mapInstance?.resize());
 }
 
-async function callTool(name, argumentsValue, message) {
-  searchButton.disabled = true;
-  refreshButton.disabled = true;
-  status.textContent = message;
-
-  try {
-    const result = await app.callServerTool({ name, arguments: argumentsValue });
-    render(resultPayload(result));
-    status.textContent = "更新しました。";
-  } catch (error) {
-    status.textContent =
-      "取得に失敗しました: " + (error instanceof Error ? error.message : "不明なエラー");
-  } finally {
-    searchButton.disabled = false;
-    refreshButton.disabled = false;
-  }
+function showError(message, detail = message) {
+  restaurants = [];
+  selectedId = null;
+  count.textContent = "—";
+  count.removeAttribute("aria-label");
+  empty.textContent = message;
+  places.replaceChildren(empty);
+  removeMarkers();
+  status.className = STATUS_ERROR_CLASS;
+  status.textContent = detail;
 }
 
-mapsLink.addEventListener("click", (event) => {
-  event.preventDefault();
-  if (mapsLink.href) void app.openLink({ url: mapsLink.href });
-});
-
-app.ontoolinput = (params) => {
-  const args = params.arguments || {};
-  if (typeof args.name === "string") nameInput.value = args.name;
-  if (typeof args.address === "string") addressInput.value = args.address;
-  status.textContent = "検索しています…";
+app.ontoolinput = () => {
+  status.textContent = "検索結果を受信しています…";
 };
 
 app.ontoolresult = (result) => {
+  if (result?.isError) {
+    const detail = result.content?.find((item) => item.type === "text")?.text;
+    showError("検索結果を取得できませんでした。", detail || "検索に失敗しました。");
+    return;
+  }
+
   render(resultPayload(result));
-  status.textContent = "検索結果を地図に表示しています。";
+  status.className = "sr-only";
+  status.textContent = "検索結果を表示しました。";
 };
 
-app.onhostcontextchanged = (context) => {
-  if (context.theme) applyDocumentTheme(context.theme);
-  if (context.styles?.variables) applyHostStyleVariables(context.styles.variables);
-  requestAnimationFrame(() => mapInstance?.resize());
-};
+app.onhostcontextchanged = applyHostContext;
 
 app.onteardown = () => {
   removeMarkers();
@@ -314,18 +384,12 @@ app.onteardown = () => {
   return {};
 };
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  void callTool("restaurant_search", searchArguments(), "検索しています…");
-});
-
-refreshButton.addEventListener("click", () => {
-  void callTool("restaurant_list", { limit: 50 }, "新着の店を読み込んでいます…");
-});
-
 try {
   await app.connect(new PostMessageTransport());
+  applyHostContext(app.getHostContext());
 } catch (error) {
-  status.textContent =
-    "MCP Appへの接続に失敗しました: " + (error instanceof Error ? error.message : "不明なエラー");
+  showError(
+    "MCP Appに接続できませんでした。",
+    "接続に失敗しました: " + (error instanceof Error ? error.message : "不明なエラー"),
+  );
 }

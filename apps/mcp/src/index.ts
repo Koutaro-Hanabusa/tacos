@@ -22,11 +22,11 @@ type Bindings = {
   PHOTO_URL_BASE: string;
 };
 
-function restaurantAppResourceMeta() {
+function restaurantAppResourceMeta(photoUrlBase: string) {
   return {
     csp: {
       connectDomains: ["https://tile.openstreetmap.org"],
-      resourceDomains: ["https://tile.openstreetmap.org"],
+      resourceDomains: ["https://tile.openstreetmap.org", new URL(photoUrlBase).origin, "data:"],
     },
     prefersBorder: true,
   };
@@ -68,7 +68,7 @@ function restaurantResult(
 function createMcpServer(db: Db, photoUrlBase: string) {
   const api = new RestaurantApi(db, { photoUrlBase });
   const server = new McpServer({ name: "tacos", version: "0.1.0" });
-  const appResourceMeta = restaurantAppResourceMeta();
+  const appResourceMeta = restaurantAppResourceMeta(photoUrlBase);
 
   registerAppResource(
     server,
