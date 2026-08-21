@@ -57,7 +57,7 @@ CI 用の Cloudflare API token と GitHub Actions の設定は Alchemy で管理
 初回と権限変更時だけ、API Tokens の作成権限を持つ admin profile で次を実行します。
 
 ```bash
-vp exec --filter @tacos/infra -- alchemy login --profile admin
+vp exec --filter @tacos/infra -- alchemy login stacks/github.ts --profile admin --configure
 vp run ci:bootstrap
 ```
 
