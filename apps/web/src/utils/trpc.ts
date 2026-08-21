@@ -12,7 +12,7 @@ export const queryClient = new QueryClient({
       toast.error(error.message, {
         action: {
           label: "retry",
-          onClick: query.invalidate,
+          onClick: () => query.invalidate(),
         },
       });
     },
@@ -22,7 +22,7 @@ export const queryClient = new QueryClient({
 export const trpcClient = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: `${env.VITE_SERVER_URL}/trpc`,
+      url: `${env.VITE_SERVER_URL}/api/trpc`,
     }),
   ],
 });

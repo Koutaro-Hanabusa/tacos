@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check-types": "tsc --noEmit",
+    "ci:bootstrap": "alchemy deploy stacks/github.ts --stage production --profile admin",
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy"
@@ -12,8 +14,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@effect/platform-node": "catalog:",
     "@tacos/config": "workspace:*",
     "alchemy": "catalog:",
+    "effect": "catalog:",
     "typescript": "catalog:"
   }
 }
