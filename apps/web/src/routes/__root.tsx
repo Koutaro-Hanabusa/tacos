@@ -6,9 +6,9 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import type { trpc } from "@/utils/trpc";
 
-import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { AppHeader } from "./-components/AppHeader";
 
 import "../index.css";
 
@@ -49,7 +49,7 @@ function RootComponent() {
         storageKey="vite-ui-theme"
       >
         <div className="grid grid-rows-[auto_1fr] h-svh">
-          <Header />
+          <AppHeader />
           <Outlet />
         </div>
         <Toaster richColors />

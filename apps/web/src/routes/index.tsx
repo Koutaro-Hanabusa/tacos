@@ -1,18 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { TacoMap } from "@/components/taco-map";
+import { restaurantsQueryOptions } from "@/features/restaurants/api/queries";
+
+import { HomeError } from "./-components/fallbacks/HomeError";
+import { HomePending } from "./-components/fallbacks/HomePending";
+import { HomePage } from "./-components/Page";
 
 export const Route = createFileRoute("/")({
-  component: HomeComponent,
+  loader: ({ context }) => context.queryClient.ensureQueryData(restaurantsQueryOptions),
+  pendingComponent: HomePending,
+  errorComponent: HomeError,
+  component: HomePage,
 });
-
-function HomeComponent() {
-  return (
-    <div className="flex h-screen flex-row">
-      <div className="w-[30%]">何かしら</div>
-      <div className="flex-1">
-        <TacoMap />
-      </div>
-    </div>
-  );
-}

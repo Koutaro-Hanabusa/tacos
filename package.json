@@ -1,40 +1,23 @@
 {
   "name": "tacos",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "apps/*",
-      "packages/*"
-    ],
-    "catalog": {
-      "dotenv": "^17.2.2",
-      "zod": "^4.1.13",
-      "typescript": "^5",
-      "@types/node": "^22.13.14",
-      "@cloudflare/workers-types": "^4.20251213.0",
-      "hono": "^4.8.2",
-      "@trpc/server": "^11.7.2",
-      "alchemy": "^0.82.1",
-      "@libsql/client": "0.15.15",
-      "libsql": "0.5.22",
-      "@trpc/client": "^11.7.2"
-    }
-  },
   "type": "module",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "check-types": "turbo check-types",
-    "dev:native": "turbo -F native dev",
-    "dev:web": "turbo -F web dev",
-    "dev:server": "turbo -F server dev",
-    "db:push": "turbo -F @tacos/db db:push",
-    "db:generate": "turbo -F @tacos/db db:generate",
-    "deploy": "turbo -F @tacos/infra deploy",
-    "destroy": "turbo -F @tacos/infra destroy",
-    "check": "oxlint && oxfmt --write",
-    "lint": "oxlint && oxfmt --check",
-    "prepare": "husky"
+    "dev": "vp run -r dev",
+    "build": "vp run -r build",
+    "check-types": "vp run -r check-types",
+    "dev:native": "vp run --filter native dev",
+    "dev:web": "vp run --filter web dev",
+    "dev:server": "vp run --filter server dev",
+    "dev:mcp": "vp run --filter @tacos/infra dev",
+    "db:push": "vp run --filter @tacos/db db:push",
+    "db:generate": "vp run --filter @tacos/db db:generate",
+    "ci:bootstrap": "vp run --filter @tacos/infra ci:bootstrap",
+    "deploy": "vp run --filter @tacos/infra deploy",
+    "destroy": "vp run --filter @tacos/infra destroy",
+    "check": "vp lint && vp fmt --write",
+    "lint": "vp lint && vp fmt --check",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@tacos/env": "workspace:*",
@@ -45,18 +28,8 @@
     "@cloudflare/workers-types": "catalog:",
     "@tacos/config": "workspace:*",
     "@types/node": "catalog:",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.2",
-    "oxfmt": "^0.26.0",
-    "oxlint": "^1.41.0",
-    "turbo": "^2.6.3",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vite-plus": "catalog:"
   },
-  "lint-staged": {
-    "*": [
-      "oxlint",
-      "oxfmt --write"
-    ]
-  },
-  "packageManager": "bun@1.2.23"
+  "packageManager": "pnpm@10.33.0"
 }

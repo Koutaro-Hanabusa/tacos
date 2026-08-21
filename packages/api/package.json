@@ -16,9 +16,11 @@
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "dotenv": "catalog:",
+    "drizzle-orm": "^0.45.2",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
     "@tacos/config": "workspace:*",
     "hono": "catalog:",
     "typescript": "catalog:"
