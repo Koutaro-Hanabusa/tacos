@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Build MCP App
+        run: vp run --filter mcp build:app
+
       - name: Check formatting and lint
         run: vp check
 
