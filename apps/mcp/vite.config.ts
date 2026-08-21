@@ -4,7 +4,7 @@ export default defineConfig({
   pack: {
     entry: "./src/index.ts",
     format: "esm",
-    outDir: "./dist",
+    outDir: "./dist/server",
     clean: true,
     deps: {
       alwaysBundle: [/@tacos\/.*/],

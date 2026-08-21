@@ -19,22 +19,16 @@ import { RESTAURANT_APP_RESOURCE_URI, restaurantAppHtml } from "./restaurant-app
 
 type Bindings = {
   DB: D1Database;
+  GOOGLE_MAPS_EMBED_API_KEY: string;
   PHOTO_URL_BASE: string;
 };
 
-function restaurantAppMeta(photoUrlBase: string) {
+function restaurantAppResourceMeta() {
   return {
-    ui: {
-      csp: {
-        resourceDomains: [
-          "https://esm.sh",
-          "https://cdn.jsdelivr.net",
-          "https://tile.openstreetmap.org",
-          new URL(photoUrlBase).origin,
-        ],
-      },
-      prefersBorder: true,
+    csp: {
+      frameDomains: ["https://www.google.com"],
     },
+    prefersBorder: true,
   };
 }
 
@@ -55,7 +49,7 @@ function restaurantResult(
       `${index + 1}. ${restaurant.name}`,
       `住所: ${restaurant.address}`,
       `緯度・経度: ${restaurant.latitude}, ${restaurant.longitude}`,
-      `地図: ${restaurant.googleMapsUrl}`,
+      `Google Maps: ${restaurant.googleMapsUrl}`,
       `写真: ${restaurant.photoUrl}`,
     ].join("\n"),
   );
@@ -71,27 +65,28 @@ function restaurantResult(
   };
 }
 
-function createMcpServer(db: Db, photoUrlBase: string) {
+function createMcpServer(db: Db, photoUrlBase: string, googleMapsEmbedApiKey: string) {
   const api = new RestaurantApi(db, { photoUrlBase });
   const server = new McpServer({ name: "tacos", version: "0.1.0" });
-  const appMeta = restaurantAppMeta(photoUrlBase);
+  const appResourceMeta = restaurantAppResourceMeta();
 
   registerAppResource(
     server,
     "Tacos restaurant map",
     RESTAURANT_APP_RESOURCE_URI,
     {
-      description: "レストランの検索結果を地図で操作する MCP App",
+      description: "レストランの検索結果をGoogle Mapsで表示する MCP App",
       mimeType: RESOURCE_MIME_TYPE,
-      _meta: appMeta,
+      _meta: { ui: appResourceMeta },
     },
     async () => ({
       contents: [
         {
           uri: RESTAURANT_APP_RESOURCE_URI,
           mimeType: RESOURCE_MIME_TYPE,
-          text: restaurantAppHtml,
-          _meta: appMeta,
+          text: restaurantAppHtml.replace("__GOOGLE_MAPS_EMBED_API_KEY__", googleMapsEmbedApiKey),
+          // Inspector 2.3 reads resource CSP directly, while other hosts use the namespaced form.
+          _meta: { ...appResourceMeta, ui: appResourceMeta },
         },
       ],
     }),
@@ -144,7 +139,11 @@ function createMcpServer(db: Db, photoUrlBase: string) {
 app.get("/", (c) => c.text("tacos mcp"));
 
 app.all("/mcp", async (c) => {
-  const server = createMcpServer(drizzle(c.env.DB, { schema }), c.env.PHOTO_URL_BASE);
+  const server = createMcpServer(
+    drizzle(c.env.DB, { schema }),
+    c.env.PHOTO_URL_BASE,
+    c.env.GOOGLE_MAPS_EMBED_API_KEY ?? "",
+  );
   const transport = new StreamableHTTPTransport();
 
   await server.connect(transport);

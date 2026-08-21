@@ -9,6 +9,7 @@ import * as Redacted from "effect/Redacted";
 config({ path: "./.env" });
 config({ path: "../../apps/web/.env" });
 config({ path: "../../apps/server/.env" });
+config({ path: "../../apps/mcp/.env" });
 
 const GITHUB_OWNER = "Koutaro-Hanabusa";
 const GITHUB_REPOSITORY = "tacos";
@@ -106,6 +107,14 @@ export default Alchemy.Stack(
       environment: production,
       name: "ADMIN_EMAIL",
       value: Redacted.make(requiredEnv("ADMIN_EMAIL")),
+    });
+
+    yield* GitHub.Secret("google-maps-embed-api-key", {
+      owner: GITHUB_OWNER,
+      repository: GITHUB_REPOSITORY,
+      environment: production,
+      name: "GOOGLE_MAPS_EMBED_API_KEY",
+      value: Redacted.make(requiredEnv("GOOGLE_MAPS_EMBED_API_KEY")),
     });
 
     yield* GitHub.Variable("vite-server-url", {
