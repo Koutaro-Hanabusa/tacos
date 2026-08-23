@@ -3,10 +3,18 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "dist",
+    "rootDir": "../..",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@shared/*": ["../../shared/*"]
     },
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  }
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../shared/restaurant-ui/**/*.ts",
+    "../../shared/restaurant-ui/**/*.tsx"
+  ]
 }
