@@ -42,12 +42,7 @@ function RootComponent() {
   return (
     <>
       <HeadContent />
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        disableTransitionOnChange
-        storageKey="vite-ui-theme"
-      >
+      <ThemeProvider attribute="class" disableTransitionOnChange forcedTheme="light">
         <div className="grid grid-rows-[auto_1fr] h-svh">
           <AppHeader />
           <Outlet />

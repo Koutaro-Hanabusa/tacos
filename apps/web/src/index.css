@@ -3,79 +3,87 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  color-scheme: light;
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Taco palette: keep these raw colors small and intentional. */
+  --taco-ink: #1a1510;
+  --taco-ink-soft: #433528;
+  --taco-paper: #f2e2bf;
+  --taco-paper-bright: #fffaf0;
+  --taco-surface: #ead2a0;
+  --taco-surface-raised: #fffaf0;
+  --taco-border: #b38d5a;
+  --taco-white: #ffffff;
+  --taco-cream: #fff7e7;
+  --taco-tortilla: #d6a85e;
+  --taco-muted: #645342;
+  --taco-roja: #c5432d;
+  --taco-roja-strong: #902d20;
+  --taco-verde: #4f7d3c;
+  --taco-verde-strong: #356332;
+  --taco-lime: #b7d83e;
+
+  /* WCAG AA contract (normal text, 4.5:1): ink on paper 14.16,
+     ink-soft on paper 9.22, muted on paper 5.74, roja-strong with cream 7.63,
+     verde-strong with cream 6.61. Bright roja and verde are accents, not body text. */
+
+  /* Semantic roles: components should use these, not raw palette values. */
+  --background: var(--taco-paper);
+  --foreground: var(--taco-ink);
+  --card: var(--taco-surface);
+  --card-foreground: var(--taco-ink);
+  --popover: var(--taco-surface-raised);
+  --popover-foreground: var(--taco-ink);
+  --primary: var(--taco-roja-strong);
+  --primary-foreground: var(--taco-white);
+  --secondary: var(--taco-verde-strong);
+  --secondary-foreground: var(--taco-white);
+  --muted: var(--taco-surface);
+  --muted-foreground: var(--taco-muted);
+  --accent: var(--taco-lime);
+  --accent-foreground: var(--taco-ink);
+  --destructive: var(--taco-roja);
+  --destructive-foreground: var(--taco-white);
+  --border: var(--taco-border);
+  --input: var(--taco-border);
+  --ring: var(--taco-roja-strong);
+  --chart-1: var(--taco-roja);
+  --chart-2: var(--taco-verde);
+  --chart-3: var(--taco-tortilla);
+  --chart-4: var(--taco-lime);
+  --chart-5: var(--taco-muted);
+  --radius: 0rem;
+  --sidebar: var(--taco-surface);
+  --sidebar-foreground: var(--taco-ink);
+  --sidebar-primary: var(--taco-roja-strong);
+  --sidebar-primary-foreground: var(--taco-white);
+  --sidebar-accent: var(--taco-lime);
+  --sidebar-accent-foreground: var(--taco-ink);
+  --sidebar-border: var(--taco-border);
+  --sidebar-ring: var(--taco-lime);
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
+  --font-sans: "Avenir Next", "Hiragino Sans", sans-serif;
+  --font-display: "Iowan Old Style", "Hiragino Mincho ProN", Georgia, serif;
+  --font-mono: "SFMono-Regular", "Cascadia Code", monospace;
+  --color-taco-ink: var(--taco-ink);
+  --color-taco-ink-soft: var(--taco-ink-soft);
+  --color-taco-paper: var(--taco-paper);
+  --color-taco-paper-bright: var(--taco-paper-bright);
+  --color-taco-surface: var(--taco-surface);
+  --color-taco-surface-raised: var(--taco-surface-raised);
+  --color-taco-border: var(--taco-border);
+  --color-taco-white: var(--taco-white);
+  --color-taco-cream: var(--taco-cream);
+  --color-taco-tortilla: var(--taco-tortilla);
+  --color-taco-muted: var(--taco-muted);
+  --color-taco-roja: var(--taco-roja);
+  --color-taco-roja-strong: var(--taco-roja-strong);
+  --color-taco-verde: var(--taco-verde);
+  --color-taco-verde-strong: var(--taco-verde-strong);
+  --color-taco-lime: var(--taco-lime);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -128,16 +136,41 @@
   }
 }
 
+@layer components {
+  .taco-spectrum {
+    background: linear-gradient(
+      90deg,
+      var(--taco-roja) 0 28%,
+      var(--taco-tortilla) 28% 54%,
+      var(--taco-verde) 54% 78%,
+      var(--taco-lime) 78%
+    );
+  }
+
+  .taco-map .maplibregl-ctrl-group {
+    background: var(--taco-surface);
+    border: 1px solid var(--taco-border);
+  }
+
+  .taco-map .maplibregl-ctrl-attrib {
+    background: var(--taco-surface);
+    color: var(--taco-muted);
+  }
+
+  .taco-map .maplibregl-ctrl-attrib a {
+    color: var(--taco-roja-strong);
+  }
+}
+
 .restaurant-map-marker {
   align-items: center;
-  background: #b94825;
-  border: 2px solid #fff7e8;
+  background: var(--taco-roja-strong);
+  border: 2px solid var(--taco-cream);
   border-radius: 999px 999px 999px 0;
-  box-shadow: 3px 3px 0 rgb(73 24 10 / 35%);
-  color: #fff7e8;
+  color: var(--taco-cream);
   cursor: pointer;
   display: inline-flex;
-  font-family: Georgia, "Hiragino Mincho ProN", serif;
+  font-family: var(--font-display);
   font-size: 0.68rem;
   font-weight: 800;
   height: 2rem;
@@ -151,13 +184,13 @@
 
 .restaurant-map-marker:hover,
 .restaurant-map-marker[data-selected="true"] {
-  background: #f2bd48;
-  color: #58200c;
+  background: var(--taco-lime);
+  color: var(--taco-ink);
   transform: rotate(-45deg) translate(-2px, -2px) scale(1.12);
 }
 
 .restaurant-map-marker:focus-visible {
-  outline: 3px solid #3d7a5d;
+  outline: 3px solid var(--taco-verde);
   outline-offset: 3px;
 }
 

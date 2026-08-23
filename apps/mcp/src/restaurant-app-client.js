@@ -10,13 +10,12 @@ const DEFAULT_CENTER = [139.6503, 35.6762];
 const DEFAULT_ZOOM = 12;
 const PLACE_BASE_CLASS = "place group w-full border transition-colors";
 const PLACE_DEFAULT_CLASS =
-  "border-[#c7854b]/40 bg-[#fdf1d7]/55 hover:border-[#a84322]/70 hover:bg-[#fff4dc] dark:border-[#743f27] dark:bg-[#2a120a]/60 dark:hover:bg-[#35170d]";
-const PLACE_SELECTED_CLASS =
-  "border-[#a84322] bg-[#fff4dc] shadow-[3px_3px_0_rgb(135_51_24_/_0.28)] dark:bg-[#3b180d]";
+  "border-taco-border/60 bg-taco-surface/70 hover:border-taco-roja/70 hover:bg-taco-surface-raised";
+const PLACE_SELECTED_CLASS = "border-taco-roja bg-taco-surface-raised";
 const PLACE_BUTTON_CLASS =
-  "place-select flex w-full gap-3 p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#a84322]";
+  "place-select flex w-full gap-3 p-3 text-left focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-taco-roja-strong";
 const STATUS_ERROR_CLASS =
-  "m-3 mt-0 border border-dashed border-[#b54220]/50 bg-[#fff4dc]/70 px-3 py-2 text-xs leading-relaxed text-[#8a321b] dark:bg-[#35170d] dark:text-[#ffb192]";
+  "m-3 mt-0 border border-dashed border-taco-roja/60 bg-taco-paper-bright/70 px-3 py-2 text-xs leading-relaxed text-taco-roja-strong";
 const count = document.getElementById("count");
 const status = document.getElementById("status");
 const empty = document.getElementById("empty");
@@ -223,7 +222,7 @@ function selectRestaurant(id) {
 function createAddressMarker() {
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   icon.setAttribute("aria-hidden", "true");
-  icon.setAttribute("class", "mt-0.5 size-3 shrink-0 text-[#b54220] dark:text-[#ff956b]");
+  icon.setAttribute("class", "mt-0.5 size-3 shrink-0 text-taco-verde");
   icon.setAttribute("fill", "none");
   icon.setAttribute("stroke", "currentColor");
   icon.setAttribute("stroke-linecap", "round");
@@ -256,7 +255,7 @@ function createPlaceElement(restaurant) {
 
   const photo = document.createElement("span");
   photo.className =
-    "grid h-20 w-20 shrink-0 place-items-center overflow-hidden border border-[#b86536]/30 bg-[#f2bd48] font-serif text-xl font-bold text-[#56210e] shadow-[3px_3px_0_rgb(87_32_13_/_0.22)]";
+    "grid h-20 w-20 shrink-0 place-items-center overflow-hidden border border-taco-tortilla/30 bg-taco-tortilla/20 font-display text-xl font-bold text-taco-ink";
 
   const image = document.createElement("img");
   image.alt = `${text(restaurant.name) || "名前のないレストラン"}の写真`;
@@ -279,11 +278,10 @@ function createPlaceElement(restaurant) {
   const content = document.createElement("span");
   content.className = "min-w-0 flex-1";
   const name = document.createElement("span");
-  name.className = "block font-serif text-lg leading-tight font-bold tracking-[-0.03em]";
+  name.className = "block font-display text-lg leading-tight font-bold tracking-[-0.03em]";
   name.textContent = text(restaurant.name) || "名前のないレストラン";
   const address = document.createElement("span");
-  address.className =
-    "mt-2 flex gap-1.5 text-xs leading-relaxed text-[#70432c] dark:text-[#e1ae8a]";
+  address.className = "mt-2 flex gap-1.5 text-xs leading-relaxed text-taco-muted";
   const addressMarker = createAddressMarker();
   const addressText = document.createElement("span");
   addressText.textContent = text(restaurant.address);
@@ -296,7 +294,7 @@ function createPlaceElement(restaurant) {
   if (mapsUrl) {
     const mapsLink = document.createElement("a");
     mapsLink.className =
-      "mx-3 mb-3 inline-flex min-h-8 items-center border border-[#b86536]/45 bg-[#fff9ec]/70 px-2.5 text-[0.68rem] font-bold text-[#7f351c] no-underline transition-colors hover:bg-[#f8e3b6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a84322] dark:bg-[#190904]/50 dark:text-[#ffb18a] dark:hover:bg-[#4a1c0d]";
+      "mx-3 mb-3 inline-flex min-h-8 items-center border border-taco-tortilla/60 bg-taco-paper-bright px-2.5 text-[0.68rem] font-bold text-taco-ink-soft no-underline transition-colors hover:bg-taco-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taco-roja-strong";
     mapsLink.href = mapsUrl;
     mapsLink.target = "_blank";
     mapsLink.rel = "noopener noreferrer";
