@@ -154,5 +154,5 @@ export function RestaurantMap({ markers, selectedId, onSelect }: RestaurantMapPr
     });
   }, [markers, selectedId]);
 
-  return <div ref={mapContainerRef} className="h-full min-h-[22rem] w-full" />;
+  return <div ref={mapContainerRef} className="taco-map h-full min-h-[22rem] w-full" />;
 }

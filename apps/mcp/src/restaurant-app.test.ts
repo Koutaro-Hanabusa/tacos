@@ -33,7 +33,7 @@ describe("restaurant MCP App", () => {
     expect(html).not.toContain('id="search"');
     expect(html).not.toContain('id="refresh"');
     expect(html).toContain("Taco index / result");
-    expect(html).toContain("bg-[#f8ead1]");
+    expect(html).toContain("bg-taco-paper");
     expect(html).not.toContain("vh");
     expect(client).toContain('from "@modelcontextprotocol/ext-apps"');
     expect(client).toContain('from "maplibre-gl"');
@@ -56,6 +56,12 @@ describe("restaurant MCP App", () => {
     expect(client).not.toContain("maps/embed/v1");
     expect(css).toContain('@import "tailwindcss"');
     expect(css).toContain(".restaurant-map-marker");
+    expect(css).toContain("--taco-roja");
+    expect(css).toContain("--taco-lime");
+    expect(css).not.toContain("box-shadow");
+    expect(css).not.toContain("color-scheme: light dark");
+    expect(client).not.toContain("dark:");
+    expect(client).not.toContain("shadow-");
     expect(viteConfig).toContain('from "@tailwindcss/vite"');
     expect(viteConfig).toContain("tailwindcss()");
   });
