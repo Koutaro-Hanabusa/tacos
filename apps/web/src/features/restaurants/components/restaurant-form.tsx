@@ -44,9 +44,6 @@ export function RestaurantForm({ onRegistered }: Props) {
       <form className="p-5 font-sans text-base sm:p-7" onSubmit={handleSubmit}>
         <div className="flex items-start justify-between gap-5 border-b border-taco-border/60 pb-5">
           <div>
-            <p className="text-xs font-bold tracking-[0.12em] text-taco-roja-strong uppercase">
-              New place
-            </p>
             <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">お店を登録</h2>
           </div>
           <span className="grid size-9 place-items-center border border-taco-lime/60 bg-taco-lime text-taco-ink">
