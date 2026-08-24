@@ -1,5 +1,5 @@
 import { ImagePlus, LoaderCircle, MapPin, Save, Search } from "lucide-react";
-import type { FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,19 @@ interface Props {
 
 export function RestaurantForm({ onRegistered }: Props) {
   const form = useRestaurantForm({ onRegistered });
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!form.photo) {
+      setPhotoPreviewUrl(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(form.photo);
+    setPhotoPreviewUrl(previewUrl);
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [form.photo]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -143,7 +156,7 @@ export function RestaurantForm({ onRegistered }: Props) {
                   {form.photo ? form.photo.name : "端末から写真を選ぶ"}
                 </span>
                 <span className="mt-1 block text-xs text-taco-muted">
-                  JPEG / PNG / WebP ・ 8 MB 以下
+                  {form.photo ? "クリックして別の写真に変更" : "JPEG / PNG / WebP ・ 8 MB 以下"}
                 </span>
               </span>
             </label>
@@ -155,6 +168,15 @@ export function RestaurantForm({ onRegistered }: Props) {
               required
               type="file"
             />
+            {photoPreviewUrl ? (
+              <span className="size-24 shrink-0 overflow-hidden border border-taco-tortilla/60 bg-taco-surface">
+                <img
+                  alt="選択した写真のプレビュー"
+                  className="size-full object-cover"
+                  src={photoPreviewUrl}
+                />
+              </span>
+            ) : null}
           </div>
         </div>
 

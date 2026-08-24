@@ -9,11 +9,10 @@ function McpAppBridge({ app }: { app: App }) {
 
   return (
     <RestaurantResultsView
-      description="見つかった店を、地図と一緒に眺められます。"
+      description="タコス大好きおじさんのぶりおによるタコスマップMCP"
       emptyDescription="検索条件を変えると、ここに写真と位置が並びます。"
       emptyTitle="条件に合う店はありません。"
       embedded
-      eyebrow="Taco index / result"
       errorMessage={view.errorMessage}
       onOpenLink={view.openLink}
       onSelect={view.selectRestaurant}

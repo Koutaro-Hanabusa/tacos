@@ -9,7 +9,6 @@ export function RestaurantResultsView({
   restaurants,
   selectedId,
   onSelect,
-  eyebrow,
   title,
   description,
   emptyTitle,
@@ -29,9 +28,6 @@ export function RestaurantResultsView({
     <main className={mainClassName}>
       <aside className="flex min-h-0 flex-col border-b border-taco-border/60 bg-taco-surface md:border-r md:border-b-0">
         <header className="border-b border-taco-border/60 px-5 py-5">
-          <p className="m-0 font-mono text-[0.66rem] font-bold tracking-[0.2em] text-taco-roja-strong uppercase">
-            {eyebrow}
-          </p>
           <div className="mt-2 flex items-end justify-between gap-4">
             <div>
               <h1 className="m-0 font-display text-3xl leading-none font-bold tracking-[-0.055em]">

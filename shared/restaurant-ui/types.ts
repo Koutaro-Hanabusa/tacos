@@ -37,7 +37,6 @@ export interface RestaurantResultsViewProps {
   restaurants: RestaurantViewData[];
   selectedId?: number;
   onSelect: (id: number) => void;
-  eyebrow: string;
   title: ReactNode;
   description: string;
   emptyTitle: string;

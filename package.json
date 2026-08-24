@@ -10,6 +10,8 @@
     "dev:web": "vp run --filter web dev",
     "dev:server": "vp run --filter server dev",
     "dev:mcp": "vp run --filter @tacos/infra dev",
+    "mcp:inspect": "mcp-inspector --server-url http://localhost:3012/mcp --transport http",
+    "mcp:check": "mcp-inspector --cli http://localhost:3012/mcp --transport http --method tools/list --format json",
     "db:push": "vp run --filter @tacos/db db:push",
     "db:generate": "vp run --filter @tacos/db db:generate",
     "ci:bootstrap": "vp run --filter @tacos/infra ci:bootstrap",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
+    "@modelcontextprotocol/inspector": "^2.3.0",
     "@tacos/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "19.2.7",
