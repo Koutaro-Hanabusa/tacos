@@ -159,15 +159,13 @@ export function RestaurantForm({ onRegistered }: Props) {
                   className="h-12 w-24 border-taco-border bg-taco-surface-raised text-center font-mono text-xl font-bold"
                   id="restaurant-rate"
                   inputMode="decimal"
-                  max={5}
-                  min={0.5}
                   onChange={(event) => {
                     const value = event.target.value;
                     form.setRate(value === "" ? null : Number(value));
                   }}
+                  placeholder="4.25"
                   required
-                  step="any"
-                  type="number"
+                  type="text"
                   value={form.rate ?? ""}
                 />
                 <span className="text-sm font-semibold text-taco-ink-soft">/ 5</span>

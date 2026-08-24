@@ -54,8 +54,8 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
       toast.error("写真を1枚選んでください。");
       return;
     }
-    if (!rate) {
-      toast.error("お店の評価を選んでください。");
+    if (rate === null || !Number.isFinite(rate) || rate < 0 || rate > 5) {
+      toast.error("お店の評価を0〜5で入力してください。");
       return;
     }
 

@@ -7,7 +7,7 @@ export type Db = DrizzleD1Database<typeof schema>;
 
 type RestaurantRow = typeof schema.restaurants.$inferSelect;
 
-export const restaurantRateInput = z.number().min(0.5).max(5);
+export const restaurantRateInput = z.number().min(0).max(5);
 
 export type PublicRestaurant = Omit<RestaurantRow, "imageKey"> & {
   googleMapsUrl: string;
