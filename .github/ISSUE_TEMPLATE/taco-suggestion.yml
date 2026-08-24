@@ -1,0 +1,45 @@
+name: タコス店を教える
+description: 行ってみてほしいタコス店を教えてください。
+title: "[店舗提案] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        行ってみてほしいタコス店を教えてください🌮
+        いただいた情報をもとに、ぶりおが食べに行きます。
+
+  - type: input
+    id: restaurant-name
+    attributes:
+      label: 店名
+      description: お店の名前を入力してください。
+      placeholder: 例）タコスファナティコ
+    validations:
+      required: true
+
+  - type: input
+    id: address
+    attributes:
+      label: 住所
+      description: お店の住所を入力してください。
+      placeholder: 例）東京都目黒区中目黒1-5-10
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: Google Maps、公式サイト、SNSなど何かしらのURLを入力してください。
+      placeholder: https://...
+    validations:
+      required: true
+
+  - type: textarea
+    id: comment
+    attributes:
+      label: コメント
+      description: おすすめポイントや、食べてほしいメニューなどを自由に書いてください。
+      placeholder: 例）生地が香ばしくて、サルサが最高です。
+    validations:
+      required: true

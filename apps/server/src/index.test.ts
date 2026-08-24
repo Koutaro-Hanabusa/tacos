@@ -146,6 +146,20 @@ describe("管理者向け店舗 API", () => {
     expect(mocks.add).not.toHaveBeenCalled();
   });
 
+  it("登録時に0点の評価を受け付ける", async () => {
+    mocks.add.mockResolvedValue({ id: 7 });
+    mocks.get.mockResolvedValue({ id: 7, name: "テスト店" });
+
+    const response = await app.request(
+      "http://localhost/api/admin/restaurants",
+      { method: "POST", body: registrationForm("35.683659", "139.754089", "0") },
+      bindings(),
+    );
+
+    expect(response.status).toBe(201);
+    expect(mocks.add).toHaveBeenCalledWith(expect.objectContaining({ rate: 0 }));
+  });
+
   it("店舗と写真を削除する", async () => {
     mocks.delete.mockResolvedValue({ id: 7, imageKey: "restaurants/7.jpg" });
 
