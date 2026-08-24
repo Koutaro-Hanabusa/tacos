@@ -8,7 +8,8 @@ export function HomePage() {
 
   return (
     <RestaurantResultsView
-      description="タコス大好きおじさんのぶりおによるタコスマップ"
+      description={`タコス大好きおじさんのぶりおによるタコスマップ。
+行ってみてほしい店は、ヘッダーのGitHub Issuesから教えてください🌮`}
       emptyDescription="最初の店を記録すると、ここに写真と位置が並びます。"
       emptyTitle="まだ一軒もありません。"
       onSelect={selection.selectRestaurant}
