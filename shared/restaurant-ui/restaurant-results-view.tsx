@@ -22,15 +22,13 @@ export function RestaurantResultsView({
 
   const mainClassName = embedded
     ? "grid min-w-0 grid-rows-[auto_22rem] bg-taco-paper md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)]"
-    : "grid h-full min-h-0 bg-taco-paper text-taco-ink lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
+    : "grid min-h-[calc(100svh-4rem)] min-w-0 bg-taco-paper text-taco-ink lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
 
   const asideClassName = embedded
     ? "bg-taco-surface"
-    : "flex min-h-0 flex-col border-b border-taco-border/60 bg-taco-surface md:border-r md:border-b-0";
+    : "border-b border-taco-border/60 bg-taco-surface md:border-r md:border-b-0";
 
-  const resultsClassName = embedded
-    ? "space-y-2 p-3"
-    : "min-h-0 flex-1 space-y-2 overflow-y-auto p-3";
+  const resultsClassName = "space-y-2 p-3";
 
   return (
     <main className={mainClassName}>
