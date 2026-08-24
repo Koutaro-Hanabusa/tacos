@@ -166,7 +166,7 @@ export function RestaurantForm({ onRegistered }: Props) {
                     form.setRate(value === "" ? null : Number(value));
                   }}
                   required
-                  step={0.5}
+                  step="any"
                   type="number"
                   value={form.rate ?? ""}
                 />

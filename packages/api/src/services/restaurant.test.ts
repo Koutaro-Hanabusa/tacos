@@ -18,8 +18,8 @@ describe("restaurant input", () => {
     });
   });
 
-  it("評価は0.5〜5の0.5刻みに制限する", () => {
-    for (const rate of [0, 5.5, 3.25]) {
+  it("評価は0.5〜5の小数を受け付ける", () => {
+    for (const rate of [0, 5.5]) {
       expect(
         registerRestaurantInput.safeParse({
           name: "テスト店",
@@ -28,6 +28,14 @@ describe("restaurant input", () => {
         }).success,
       ).toBe(false);
     }
+
+    expect(
+      registerRestaurantInput.safeParse({
+        name: "テスト店",
+        address: "東京都千代田区千代田1-1",
+        rate: 3.25,
+      }).success,
+    ).toBe(true);
   });
 
   it("保存 input は位置情報と画像キーを必須にする", () => {

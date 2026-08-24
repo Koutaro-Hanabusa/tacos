@@ -25,9 +25,7 @@ function restaurant(value: unknown): RestaurantViewData | null {
   const longitude = Number(value.longitude);
   const rawRate = value.rate === null || value.rate === undefined ? null : Number(value.rate);
   const rate =
-    rawRate !== null && Number.isFinite(rawRate) && rawRate >= 0.5 && rawRate <= 5
-      ? Math.round(rawRate * 2) / 2
-      : null;
+    rawRate !== null && Number.isFinite(rawRate) && rawRate >= 0.5 && rawRate <= 5 ? rawRate : null;
   if (!Number.isInteger(id) || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
     return null;
   }
