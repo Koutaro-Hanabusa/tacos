@@ -43,7 +43,7 @@ function RootComponent() {
     <>
       <HeadContent />
       <ThemeProvider attribute="class" disableTransitionOnChange forcedTheme="light">
-        <div className="grid grid-rows-[auto_1fr] h-svh">
+        <div className="min-h-svh">
           <AppHeader />
           <Outlet />
         </div>
