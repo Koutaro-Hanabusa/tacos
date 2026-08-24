@@ -21,50 +21,67 @@ export function RestaurantResultsView({
   const markers = useMemo(() => toRestaurantMarkers(restaurants), [restaurants]);
 
   const mainClassName = embedded
-    ? "grid h-[40rem] min-w-0 grid-rows-[minmax(18rem,1fr)_22rem] overflow-hidden bg-taco-paper md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)] md:grid-rows-1"
+    ? "grid min-w-0 grid-rows-[auto_22rem] bg-taco-paper md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)]"
     : "grid h-full min-h-0 bg-taco-paper text-taco-ink lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
+
+  const asideClassName = embedded
+    ? "bg-taco-surface"
+    : "flex min-h-0 flex-col border-b border-taco-border/60 bg-taco-surface md:border-r md:border-b-0";
+
+  const resultsClassName = embedded
+    ? "space-y-2 p-3"
+    : "min-h-0 flex-1 space-y-2 overflow-y-auto p-3";
 
   return (
     <main className={mainClassName}>
-      <aside className="flex min-h-0 flex-col border-b border-taco-border/60 bg-taco-surface md:border-r md:border-b-0">
-        <header className="border-b border-taco-border/60 px-5 py-5">
+      <aside className={asideClassName}>
+        <header className="px-5 py-5 border-b border-taco-border/60">
           <div className="mt-2 flex items-end justify-between gap-4">
             <div>
-              <h1 className="m-0 font-display text-3xl leading-none font-bold tracking-[-0.055em]">
+              <h1 className="m-0 text-3xl leading-none font-extrabold tracking-[-0.04em]">
                 {title}
               </h1>
-              <p className="mt-3 mb-0 text-xs leading-relaxed text-taco-muted">{description}</p>
+              <p className="mt-3 mb-0 text-sm leading-relaxed text-taco-muted">{description}</p>
             </div>
-            <span
-              aria-label={status === "ready" ? `${restaurants.length}件のレストラン` : undefined}
-              className="border border-taco-lime/60 bg-taco-lime px-2 py-1 font-mono text-xs font-bold text-taco-ink"
-            >
-              {status === "ready" ? restaurants.length : "—"}
-            </span>
           </div>
         </header>
 
-        <div
-          aria-label="検索結果のレストラン"
-          className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3"
-        >
+        <div aria-label="検索結果のレストラン" className={resultsClassName}>
+          <div className="flex justify-end px-1 pb-1">
+            <span
+              aria-label={status === "ready" ? `${restaurants.length}件のレストラン` : undefined}
+              className="inline-flex items-baseline gap-1 text-taco-muted"
+            >
+              {status === "ready" ? (
+                <>
+                  <span className="font-mono text-base leading-none font-bold text-taco-ink">
+                    {restaurants.length}
+                  </span>
+                  <span className="text-xs leading-none font-semibold">件</span>
+                </>
+              ) : (
+                <span className="font-mono text-base leading-none font-bold">—</span>
+              )}
+            </span>
+          </div>
+
           {status === "loading" ? (
-            <p className="m-0 grid min-h-52 place-items-center border border-dashed border-taco-border/70 px-7 text-center font-display text-xl font-bold">
+            <p className="m-0 grid min-h-52 place-items-center rounded-md border border-dashed border-taco-border/70 px-7 text-center text-xl font-bold">
               検索結果を待っています。
             </p>
           ) : null}
 
           {status === "error" ? (
-            <p className="m-0 border border-dashed border-taco-roja/60 bg-taco-paper-bright/70 px-3 py-3 text-xs leading-relaxed text-taco-roja-strong">
+            <p className="m-0 rounded-md border border-dashed border-taco-roja/60 bg-taco-paper-bright/70 px-3 py-3 text-sm leading-relaxed text-taco-roja-strong">
               {errorMessage || "検索結果を取得できませんでした。"}
             </p>
           ) : null}
 
           {status === "ready" && restaurants.length === 0 ? (
-            <div className="grid min-h-52 place-items-center border border-dashed border-taco-border/70 px-7 text-center">
+            <div className="grid min-h-52 place-items-center rounded-md border border-dashed border-taco-border/70 px-7 text-center">
               <div>
-                <p className="m-0 font-display text-xl font-bold">{emptyTitle}</p>
-                <p className="mt-2 mb-0 text-xs leading-relaxed text-taco-muted">
+                <p className="m-0 text-xl font-bold">{emptyTitle}</p>
+                <p className="mt-2 mb-0 text-sm leading-relaxed text-taco-muted">
                   {emptyDescription}
                 </p>
               </div>

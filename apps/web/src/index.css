@@ -29,7 +29,7 @@
   --chart-3: var(--taco-tortilla);
   --chart-4: var(--taco-lime);
   --chart-5: var(--taco-muted);
-  --radius: 0rem;
+  --radius: 0.625rem;
   --sidebar: var(--taco-surface);
   --sidebar-foreground: var(--taco-ink);
   --sidebar-primary: var(--taco-roja-strong);

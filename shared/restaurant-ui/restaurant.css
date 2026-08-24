@@ -22,6 +22,7 @@
   --taco-verde: #4f7d3c;
   --taco-verde-strong: #356332;
   --taco-lime: #b7d83e;
+  --taco-radius: 0.625rem;
 
   /* WCAG AA contract (normal text, 4.5:1): ink on paper 14.16,
      ink-soft on paper 9.22, muted on paper 5.74, roja-strong with cream 7.63,
@@ -48,6 +49,10 @@
   --color-taco-verde: var(--taco-verde);
   --color-taco-verde-strong: var(--taco-verde-strong);
   --color-taco-lime: var(--taco-lime);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: var(--taco-radius);
+  --radius-xl: 0.75rem;
 }
 
 html,

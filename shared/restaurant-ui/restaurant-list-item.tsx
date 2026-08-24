@@ -15,7 +15,7 @@ export function RestaurantListItem({
 
   return (
     <article
-      className={`place group w-full border transition-colors ${
+      className={`place group w-full overflow-hidden rounded-md border transition-colors ${
         selected
           ? "border-taco-roja bg-taco-surface-raised"
           : "border-taco-border/60 bg-taco-surface/70 hover:border-taco-roja/70 hover:bg-taco-surface-raised"
@@ -42,13 +42,13 @@ export function RestaurantListItem({
           )}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-display text-lg leading-tight font-bold tracking-[-0.03em]">
+          <span className="block text-lg leading-tight font-bold tracking-[-0.02em]">
             {restaurant.name || "名前のないレストラン"}
           </span>
-          <span className="mt-2 flex gap-1.5 text-xs leading-relaxed text-taco-muted">
+          <span className="mt-2 flex gap-1.5 text-sm leading-relaxed text-taco-muted">
             <svg
               aria-hidden="true"
-              className="mt-0.5 size-3 shrink-0 text-taco-verde"
+              className="mt-0.5 size-3.5 shrink-0 text-taco-verde"
               fill="none"
               stroke="currentColor"
               strokeLinecap="round"
@@ -61,12 +61,22 @@ export function RestaurantListItem({
             </svg>
             <span>{restaurant.address}</span>
           </span>
+          {restaurant.rate !== null ? (
+            <span className="mt-2 flex items-center gap-2 text-sm text-taco-ink-soft">
+              <span className="font-mono font-bold">{restaurant.rate} / 5</span>
+            </span>
+          ) : null}
+          {restaurant.memo ? (
+            <span className="mt-1 block line-clamp-2 text-sm leading-relaxed text-taco-ink-soft">
+              {restaurant.memo}
+            </span>
+          ) : null}
         </span>
       </button>
 
       {mapsUrl ? (
         <a
-          className="mx-3 mb-3 inline-flex min-h-8 items-center border border-taco-tortilla/60 bg-taco-paper-bright px-2.5 text-[0.68rem] font-bold text-taco-ink-soft no-underline transition-colors hover:bg-taco-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taco-roja-strong"
+          className="mx-3 mb-3 inline-flex min-h-9 items-center border border-taco-tortilla/60 bg-taco-paper-bright px-2.5 text-sm font-semibold text-taco-ink-soft no-underline transition-colors hover:bg-taco-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taco-roja-strong"
           href={mapsUrl}
           onClick={(event) => {
             if (!onOpenLink) return;
