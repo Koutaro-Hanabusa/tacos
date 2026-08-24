@@ -1,4 +1,4 @@
-import { ImagePlus, LoaderCircle, MapPin, Save, Search } from "lucide-react";
+import { ImagePlus, LoaderCircle, MapPin, Search } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,14 @@ import { useRestaurantForm } from "@/features/restaurants/hooks/use-restaurant-f
 
 interface Props {
   onRegistered: () => Promise<void> | void;
+}
+
+function RequiredBadge() {
+  return (
+    <span className="ml-2 inline-flex items-center border border-taco-roja/50 bg-taco-roja/10 px-1.5 py-0.5 text-xs font-semibold leading-none text-taco-roja-strong">
+      必須
+    </span>
+  );
 }
 
 export function RestaurantForm({ onRegistered }: Props) {
@@ -32,14 +40,14 @@ export function RestaurantForm({ onRegistered }: Props) {
   }
 
   return (
-    <section className="border border-taco-border bg-taco-surface p-1">
-      <form className="border border-taco-border/60 p-5 sm:p-7" onSubmit={handleSubmit}>
+    <section className="overflow-hidden rounded-lg border border-taco-border bg-taco-surface">
+      <form className="p-5 font-sans text-base sm:p-7" onSubmit={handleSubmit}>
         <div className="flex items-start justify-between gap-5 border-b border-taco-border/60 pb-5">
           <div>
-            <p className="font-mono text-[0.65rem] font-bold tracking-[0.16em] text-taco-roja-strong uppercase">
+            <p className="text-xs font-bold tracking-[0.12em] text-taco-roja-strong uppercase">
               New place
             </p>
-            <h2 className="mt-1 font-display text-3xl font-bold tracking-[-0.05em]">お店を登録</h2>
+            <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">お店を登録</h2>
           </div>
           <span className="grid size-9 place-items-center border border-taco-lime/60 bg-taco-lime text-taco-ink">
             <MapPin className="size-4" />
@@ -49,14 +57,14 @@ export function RestaurantForm({ onRegistered }: Props) {
         <div className="mt-6 space-y-5">
           <div className="space-y-2">
             <Label
-              className="font-mono text-[0.67rem] font-bold tracking-[0.12em] text-taco-ink-soft uppercase"
+              className="text-sm font-semibold tracking-normal text-taco-ink-soft"
               htmlFor="restaurant-name"
             >
-              店名 <span aria-hidden="true">*</span>
+              店名 <RequiredBadge />
             </Label>
             <Input
               autoComplete="organization"
-              className="h-11 border-taco-border bg-taco-paper-bright px-3 text-sm placeholder:text-taco-muted"
+              className="h-12 border-taco-border bg-taco-paper-bright px-3 text-base placeholder:text-taco-muted"
               id="restaurant-name"
               maxLength={120}
               onChange={(event) => form.setName(event.target.value)}
@@ -68,15 +76,15 @@ export function RestaurantForm({ onRegistered }: Props) {
 
           <div className="space-y-2">
             <Label
-              className="font-mono text-[0.67rem] font-bold tracking-[0.12em] text-taco-ink-soft uppercase"
+              className="text-sm font-semibold tracking-normal text-taco-ink-soft"
               htmlFor="restaurant-address"
             >
-              住所 <span aria-hidden="true">*</span>
+              住所 <RequiredBadge />
             </Label>
             <div className="flex gap-2">
               <Input
                 autoComplete="street-address"
-                className="h-11 border-taco-border bg-taco-paper-bright px-3 text-sm placeholder:text-taco-muted"
+                className="h-12 border-taco-border bg-taco-paper-bright px-3 text-base placeholder:text-taco-muted"
                 id="restaurant-address"
                 maxLength={300}
                 onChange={(event) => form.changeAddress(event.target.value)}
@@ -85,11 +93,11 @@ export function RestaurantForm({ onRegistered }: Props) {
                 value={form.address}
               />
               <Button
-                className="h-11 shrink-0 border-taco-tortilla/60 bg-taco-paper-bright text-taco-ink-soft hover:bg-taco-surface"
+                className="h-12 shrink-0 text-sm"
                 disabled={form.isGeocoding || !form.normalizedAddress}
                 onClick={form.geocode}
                 type="button"
-                variant="outline"
+                variant="secondary"
               >
                 {form.isGeocoding ? (
                   <LoaderCircle className="size-3.5 animate-spin" />
@@ -99,68 +107,116 @@ export function RestaurantForm({ onRegistered }: Props) {
                 {form.isGeocoding ? "検索中" : "座標を検索"}
               </Button>
             </div>
-            <p className="text-[0.68rem] leading-relaxed text-taco-muted">
+            <p className="text-sm leading-relaxed text-taco-muted">
               番地まで入れると、地図上の位置が安定します。
             </p>
             <div
               aria-live="polite"
-              className="border border-dashed border-taco-border bg-taco-surface-raised px-3 py-3"
+              className="rounded-sm border border-dashed border-taco-border bg-taco-surface-raised px-3 py-3"
             >
               {form.coordinates ? (
                 <>
-                  <p className="font-mono text-[0.63rem] font-bold tracking-[0.12em] text-taco-ink-soft uppercase">
+                  <p className="text-sm font-semibold tracking-wide text-taco-ink-soft">
                     確認した位置
                   </p>
-                  <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                  <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
                     <div>
                       <dt className="text-taco-muted">緯度</dt>
-                      <dd className="mt-0.5 font-mono font-bold">
+                      <dd className="mt-0.5 font-mono text-sm font-semibold">
                         {form.coordinates.latitude.toFixed(6)}
                       </dd>
                     </div>
                     <div>
                       <dt className="text-taco-muted">経度</dt>
-                      <dd className="mt-0.5 font-mono font-bold">
+                      <dd className="mt-0.5 font-mono text-sm font-semibold">
                         {form.coordinates.longitude.toFixed(6)}
                       </dd>
                     </div>
                   </dl>
-                  <p className="mt-2 text-[0.68rem] leading-relaxed text-taco-muted">
+                  <p className="mt-2 text-sm leading-relaxed text-taco-muted">
                     この位置で登録します。住所を変更すると、もう一度検索が必要です。
                   </p>
                 </>
               ) : (
-                <p className="text-[0.68rem] leading-relaxed text-taco-muted">
+                <p className="text-sm leading-relaxed text-taco-muted">
                   住所を検索すると、登録前に緯度と経度を確認できます。
                 </p>
               )}
             </div>
           </div>
 
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Label
+                className="text-sm font-semibold tracking-normal text-taco-ink-soft"
+                htmlFor="restaurant-rate"
+              >
+                評価 <RequiredBadge />
+              </Label>
+              <div className="inline-flex min-h-14 items-center gap-4">
+                <Input
+                  aria-label="評価"
+                  className="h-12 w-24 border-taco-border bg-taco-surface-raised text-center font-mono text-xl font-bold"
+                  id="restaurant-rate"
+                  inputMode="decimal"
+                  max={5}
+                  min={0.5}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    form.setRate(value === "" ? null : Number(value));
+                  }}
+                  required
+                  step={0.5}
+                  type="number"
+                  value={form.rate ?? ""}
+                />
+                <span className="text-sm font-semibold text-taco-ink-soft">/ 5</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                className="text-sm font-semibold tracking-normal text-taco-ink-soft"
+                htmlFor="restaurant-memo"
+              >
+                おいしいものメモ <span className="normal-case text-taco-muted">（任意）</span>
+              </Label>
+              <textarea
+                className="min-h-12 w-full resize-y border border-taco-border bg-taco-paper-bright px-3 py-2.5 text-base text-taco-ink outline-none placeholder:text-taco-muted focus-visible:ring-2 focus-visible:ring-taco-roja-strong"
+                id="restaurant-memo"
+                maxLength={1000}
+                onChange={(event) => form.setMemo(event.target.value)}
+                placeholder="例: ケサディーヤが最高です"
+                rows={3}
+                value={form.memo}
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label
-              className="font-mono text-[0.67rem] font-bold tracking-[0.12em] text-taco-ink-soft uppercase"
+              className="text-sm font-semibold tracking-normal text-taco-ink-soft"
               htmlFor="restaurant-photo"
             >
-              写真 <span aria-hidden="true">*</span>
+              写真 <RequiredBadge />
             </Label>
             <label
-              className="group flex min-h-28 cursor-pointer items-center gap-4 border border-dashed border-taco-tortilla/70 bg-taco-tortilla/20 px-4 py-4 transition-colors hover:bg-taco-tortilla/30"
+              className="group flex min-h-28 cursor-pointer items-center gap-4 rounded-md border border-dashed border-taco-tortilla/70 bg-taco-tortilla/20 px-4 py-4 transition-colors hover:bg-taco-tortilla/30"
               htmlFor="restaurant-photo"
             >
               <span className="grid size-10 shrink-0 place-items-center border border-taco-tortilla/60 bg-taco-surface text-taco-verde-strong">
                 <ImagePlus className="size-5" />
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-sm font-bold">
+                <span className="block truncate text-base font-bold">
                   {form.photo ? form.photo.name : "端末から写真を選ぶ"}
                 </span>
-                <span className="mt-1 block text-xs text-taco-muted">
+                <span className="mt-1 block text-sm text-taco-muted">
                   {form.photo ? "クリックして別の写真に変更" : "JPEG / PNG / WebP ・ 8 MB 以下"}
                 </span>
               </span>
             </label>
-            <Input
+            <input
               accept="image/jpeg,image/png,image/webp"
               className="sr-only"
               id="restaurant-photo"
@@ -169,7 +225,7 @@ export function RestaurantForm({ onRegistered }: Props) {
               type="file"
             />
             {photoPreviewUrl ? (
-              <span className="size-24 shrink-0 overflow-hidden border border-taco-tortilla/60 bg-taco-surface">
+              <span className="size-24 shrink-0 overflow-hidden rounded-sm border border-taco-tortilla/60 bg-taco-surface">
                 <img
                   alt="選択した写真のプレビュー"
                   className="size-full object-cover"
@@ -181,16 +237,12 @@ export function RestaurantForm({ onRegistered }: Props) {
         </div>
 
         <Button
-          className="mt-7 h-11 w-full border-taco-roja-strong bg-taco-roja-strong font-bold text-taco-cream hover:bg-taco-roja"
+          className="mt-7 h-12 w-full text-base font-bold"
           disabled={form.isRegistering || !form.coordinates}
           size="lg"
           type="submit"
         >
-          {form.isRegistering ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : (
-            <Save className="size-4" />
-          )}
+          {form.isRegistering ? <LoaderCircle className="size-4 animate-spin" /> : null}
           {form.isRegistering
             ? "保存中…"
             : form.coordinates

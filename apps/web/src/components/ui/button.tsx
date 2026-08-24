@@ -10,23 +10,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
-        outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
+        primary:
+          "border-taco-roja-strong bg-taco-roja-strong text-taco-cream hover:bg-taco-roja aria-expanded:bg-taco-roja",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
-        destructive:
-          "bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 text-destructive focus-visible:border-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border-taco-verde-strong bg-transparent text-taco-verde-strong hover:bg-taco-verde/10 aria-expanded:bg-taco-verde/10",
       },
       size: {
         default:
           "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         xs: "h-6 gap-1 rounded-none px-2 text-xs has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-none px-2.5 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
+        lg: "h-10 gap-1.5 px-3 text-sm has-data-[icon=inline-end]:pr-3.5 has-data-[icon=inline-start]:pl-3.5",
         icon: "size-8",
         "icon-xs": "size-6 rounded-none [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-7 rounded-none",
@@ -34,18 +28,15 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   },
 );
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants>;
+
+function Button({ className, variant = "primary", size = "default", ...props }: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -55,4 +46,19 @@ function Button({
   );
 }
 
-export { Button, buttonVariants };
+type DangerButtonProps = Omit<ButtonProps, "variant">;
+
+function DangerButton({ className, ...props }: DangerButtonProps) {
+  return (
+    <Button
+      {...props}
+      className={cn(
+        "border-taco-roja-strong bg-taco-roja-strong text-taco-cream hover:bg-taco-roja focus-visible:border-taco-roja-strong focus-visible:ring-taco-roja/30",
+        className,
+      )}
+      variant="primary"
+    />
+  );
+}
+
+export { Button, buttonVariants, DangerButton };
