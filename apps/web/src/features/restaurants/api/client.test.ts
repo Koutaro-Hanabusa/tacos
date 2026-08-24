@@ -15,6 +15,8 @@ const restaurant = {
   address: "東京都渋谷区神宮前 1-2-3",
   latitude: 35.671,
   longitude: 139.706,
+  rate: 4.5,
+  memo: "カルニタスがよかった",
   googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=35.671%2C139.706",
   photoUrl: "https://api.example.test/photos/1",
   createdAt: null,
@@ -88,6 +90,8 @@ describe("restaurant API client", () => {
         address: restaurant.address,
         latitude: restaurant.latitude,
         longitude: restaurant.longitude,
+        rate: restaurant.rate,
+        memo: restaurant.memo ?? "",
         photo: photo(),
       }),
     ).resolves.toEqual(restaurant);
@@ -96,6 +100,8 @@ describe("restaurant API client", () => {
     const formData = options.body as FormData;
     expect(formData.get("latitude")).toBe("35.671");
     expect(formData.get("longitude")).toBe("139.706");
+    expect(formData.get("rate")).toBe("4.5");
+    expect(formData.get("memo")).toBe("カルニタスがよかった");
   });
 
   it("不正な登録成功レスポンスを受け入れない", async () => {
@@ -107,6 +113,8 @@ describe("restaurant API client", () => {
         address: restaurant.address,
         latitude: restaurant.latitude,
         longitude: restaurant.longitude,
+        rate: restaurant.rate,
+        memo: restaurant.memo ?? "",
         photo: photo(),
       }),
     ).rejects.toBeInstanceOf(ZodError);

@@ -48,6 +48,8 @@ function restaurantResult(
     [
       `${index + 1}. ${restaurant.name}`,
       `住所: ${restaurant.address}`,
+      ...(restaurant.rate === null ? [] : [`評価: ${restaurant.rate}/5`]),
+      ...(restaurant.memo ? [`メモ: ${restaurant.memo}`] : []),
       `緯度・経度: ${restaurant.latitude}, ${restaurant.longitude}`,
       `Google Maps: ${restaurant.googleMapsUrl}`,
       `写真: ${restaurant.photoUrl}`,

@@ -8,6 +8,8 @@ const restaurant = {
   address: "東京都渋谷区",
   latitude: "35.66",
   longitude: 139.7,
+  rate: 4.5,
+  memo: "牛タンのタコス",
   googleMapsUrl: "https://www.google.com/maps/place/La+Taqueria",
   photoUrl: "https://example.com/taco.jpg",
 };
@@ -27,6 +29,8 @@ describe("restaurant app data", () => {
         address: "東京都渋谷区",
         latitude: 35.66,
         longitude: 139.7,
+        rate: 4.5,
+        memo: "牛タンのタコス",
         googleMapsUrl: "https://www.google.com/maps/place/La+Taqueria",
         photoUrl: "https://example.com/taco.jpg",
       },

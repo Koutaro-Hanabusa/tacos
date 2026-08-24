@@ -5,6 +5,7 @@ import {
   listRestaurantInput,
   registerRestaurantInput,
   RestaurantApi,
+  restaurantRateInput,
 } from "@tacos/api/services/restaurant";
 import * as schema from "@tacos/db/schema";
 import { env } from "@tacos/env/server";
@@ -30,6 +31,10 @@ const acceptedPhotoTypes = {
 const geocodeInput = registerRestaurantInput.pick({ address: true });
 
 const registrationInput = registerRestaurantInput.extend({
+  rate: z
+    .union([z.number(), z.string().trim().min(1)])
+    .transform((value) => Number(value))
+    .pipe(restaurantRateInput),
   latitude: z
     .union([z.number(), z.string().trim().min(1)])
     .transform((value) => Number(value))
@@ -181,6 +186,8 @@ app.post("/api/admin/restaurants", async (c) => {
   const parsed = registrationInput.safeParse({
     name: body.name,
     address: body.address,
+    rate: body.rate,
+    memo: body.memo,
     latitude: body.latitude,
     longitude: body.longitude,
   });
