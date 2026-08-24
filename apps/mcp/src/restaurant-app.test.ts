@@ -59,6 +59,7 @@ describe("restaurant MCP App", () => {
     expect(data).toContain("normalizeRestaurantResult");
     expect(data).toContain("restaurantResultError");
     expect(shared).toContain('export { RestaurantResultsView } from "./restaurant-results-view"');
+    expect(shared).toContain("export {\n  Button,");
     expect(shared).toContain('export { RestaurantMap } from "./restaurant-map"');
     expect(shared).toContain("export { safeGoogleMapsUrl, safeHttpUrl, textValue }");
     expect(sharedResults).toContain("export function RestaurantResultsView");
@@ -69,12 +70,20 @@ describe("restaurant MCP App", () => {
     expect(sharedMapHook).toContain("flyTo");
     expect(sharedMapHook).toContain('element.className = "restaurant-map-marker"');
     expect(sharedListItem).toContain("safeGoogleMapsUrl");
+    expect(sharedListItem).toContain('import { Button } from "./button"');
+    expect(sharedListItem).toContain("Google Mapsで開く");
+    expect(sharedListItem).not.toContain("↗");
+    expect(sharedListItem).not.toContain("<button");
+    expect(sharedListItem).toContain("<dialog");
+    expect(sharedListItem).toContain("dialog.showModal()");
+    expect(sharedListItem).toContain("写真プレビューを閉じる");
     expect(sharedUtils).toContain("safeHttpUrl");
     expect(sharedUtils).toContain("safeGoogleMapsUrl");
     expect(css).toContain('@import "tailwindcss"');
     expect(css).toContain('@import "../../../shared/restaurant-ui/restaurant.css"');
     expect(webCss).toContain('@import "../../../shared/restaurant-ui/restaurant.css"');
     expect(sharedCss).toContain(".restaurant-map-marker");
+    expect(sharedCss).toContain(".taco-button");
     expect(sharedCss).toContain("--taco-roja");
     expect(sharedCss).toContain("--taco-lime");
     expect(sharedCss).toContain('@source "./"');

@@ -7,6 +7,13 @@ const restaurantSchema = z.object({
   address: z.string(),
   latitude: z.number(),
   longitude: z.number(),
+  rate: z
+    .number()
+    .min(0.5)
+    .max(5)
+    .refine((value) => Number.isInteger(value * 2))
+    .nullable(),
+  memo: z.string().nullable(),
   googleMapsUrl: z.string(),
   photoUrl: z.string(),
   createdAt: z.string().nullable(),
@@ -68,6 +75,8 @@ export async function registerRestaurant(input: {
   address: string;
   latitude: number;
   longitude: number;
+  rate: number;
+  memo: string;
   photo: File;
 }) {
   const formData = new FormData();
@@ -75,6 +84,8 @@ export async function registerRestaurant(input: {
   formData.set("address", input.address);
   formData.set("latitude", String(input.latitude));
   formData.set("longitude", String(input.longitude));
+  formData.set("rate", String(input.rate));
+  formData.set("memo", input.memo);
   formData.set("photo", input.photo);
 
   const response = await fetch(endpoint("/api/admin/restaurants"), {

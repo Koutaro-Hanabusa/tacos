@@ -6,6 +6,8 @@ export interface RestaurantViewData {
   address: string;
   latitude: number;
   longitude: number;
+  rate: number | null;
+  memo: string | null;
   googleMapsUrl: string;
   photoUrl: string;
 }
@@ -37,7 +39,6 @@ export interface RestaurantResultsViewProps {
   restaurants: RestaurantViewData[];
   selectedId?: number;
   onSelect: (id: number) => void;
-  eyebrow: string;
   title: ReactNode;
   description: string;
   emptyTitle: string;

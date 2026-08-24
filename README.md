@@ -37,9 +37,21 @@ Run the development server:
 vp run dev
 ```
 
+`vp run dev` はWeb/API/MCPの開発サーバーを起動します。
+
 - Web: [http://localhost:3011](http://localhost:3011)
 - API: [http://localhost:3010](http://localhost:3010)
 - MCP: [http://localhost:3012/mcp](http://localhost:3012/mcp)
+
+ローカルMCPの動作確認は、MCPサーバーを起動した状態で別のターミナルからMCP Inspectorを実行します。
+
+```bash
+# ブラウザのInspectorを起動する
+vp run mcp:inspect
+
+# CLIで tools/list を確認する
+vp run mcp:check
+```
 
 ローカルの `/admin` は Cloudflare Access と `ADMIN_EMAIL` なしで利用できます。
 
@@ -94,6 +106,8 @@ tacos/
 - `vp run dev:web` — start only the web app
 - `vp run dev:server` — start only the server
 - `vp run dev:mcp` — start only the MCP server (port 3012)
+- `vp run mcp:inspect` — open MCP Inspector for the local MCP server
+- `vp run mcp:check` — check the local MCP server with Inspector CLI
 - `vp run check-types` — type-check across all packages
 - `vp run db:push` — push schema changes to the database
 - `vp run db:generate` — generate migrations

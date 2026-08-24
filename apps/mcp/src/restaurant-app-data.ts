@@ -23,6 +23,11 @@ function restaurant(value: unknown): RestaurantViewData | null {
   const id = Number(value.id);
   const latitude = Number(value.latitude);
   const longitude = Number(value.longitude);
+  const rawRate = value.rate === null || value.rate === undefined ? null : Number(value.rate);
+  const rate =
+    rawRate !== null && Number.isFinite(rawRate) && rawRate >= 0.5 && rawRate <= 5
+      ? Math.round(rawRate * 2) / 2
+      : null;
   if (!Number.isInteger(id) || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
     return null;
   }
@@ -33,6 +38,8 @@ function restaurant(value: unknown): RestaurantViewData | null {
     address: textValue(value.address),
     latitude,
     longitude,
+    rate,
+    memo: value.memo === null || value.memo === undefined ? null : textValue(value.memo),
     googleMapsUrl: textValue(value.googleMapsUrl),
     photoUrl: textValue(value.photoUrl),
   };
