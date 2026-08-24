@@ -1,81 +1,46 @@
-@import "maplibre-gl/dist/maplibre-gl.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-
-@custom-variant dark (&:is(.dark *));
+@import "../../../shared/restaurant-ui/restaurant.css";
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.87 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.371 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Semantic roles: components should use these, not raw palette values. */
+  --background: var(--taco-paper);
+  --foreground: var(--taco-ink);
+  --card: var(--taco-surface);
+  --card-foreground: var(--taco-ink);
+  --popover: var(--taco-surface-raised);
+  --popover-foreground: var(--taco-ink);
+  --primary: var(--taco-roja-strong);
+  --primary-foreground: var(--taco-white);
+  --secondary: var(--taco-verde-strong);
+  --secondary-foreground: var(--taco-white);
+  --muted: var(--taco-surface);
+  --muted-foreground: var(--taco-muted);
+  --accent: var(--taco-lime);
+  --accent-foreground: var(--taco-ink);
+  --destructive: var(--taco-roja);
+  --destructive-foreground: var(--taco-white);
+  --border: var(--taco-border);
+  --input: var(--taco-border);
+  --ring: var(--taco-roja-strong);
+  --chart-1: var(--taco-roja);
+  --chart-2: var(--taco-verde);
+  --chart-3: var(--taco-tortilla);
+  --chart-4: var(--taco-lime);
+  --chart-5: var(--taco-muted);
+  --radius: 0rem;
+  --sidebar: var(--taco-surface);
+  --sidebar-foreground: var(--taco-ink);
+  --sidebar-primary: var(--taco-roja-strong);
+  --sidebar-primary-foreground: var(--taco-white);
+  --sidebar-accent: var(--taco-lime);
+  --sidebar-accent-foreground: var(--taco-ink);
+  --sidebar-border: var(--taco-border);
+  --sidebar-ring: var(--taco-lime);
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -120,47 +85,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply font-sans bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
-}
-
-.restaurant-map-marker {
-  align-items: center;
-  background: #b94825;
-  border: 2px solid #fff7e8;
-  border-radius: 999px 999px 999px 0;
-  box-shadow: 3px 3px 0 rgb(73 24 10 / 35%);
-  color: #fff7e8;
-  cursor: pointer;
-  display: inline-flex;
-  font-family: Georgia, "Hiragino Mincho ProN", serif;
-  font-size: 0.68rem;
-  font-weight: 800;
-  height: 2rem;
-  justify-content: center;
-  transform: rotate(-45deg);
-  transition:
-    transform 160ms ease,
-    background-color 160ms ease;
-  width: 2rem;
-}
-
-.restaurant-map-marker:hover,
-.restaurant-map-marker[data-selected="true"] {
-  background: #f2bd48;
-  color: #58200c;
-  transform: rotate(-45deg) translate(-2px, -2px) scale(1.12);
-}
-
-.restaurant-map-marker:focus-visible {
-  outline: 3px solid #3d7a5d;
-  outline-offset: 3px;
-}
-
-.restaurant-map-marker > span {
-  transform: rotate(45deg);
 }

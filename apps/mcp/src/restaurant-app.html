@@ -6,76 +6,8 @@
     <title>Tacos restaurant map</title>
     <link rel="stylesheet" href="./restaurant-app.css" />
   </head>
-  <body class="m-0 min-w-0 bg-[#f8ead1] text-[#30170d] dark:bg-[#1b0c07] dark:text-[#fff0d7]">
-    <main
-      class="grid h-[40rem] min-w-0 grid-rows-[minmax(18rem,1fr)_22rem] overflow-hidden bg-[#f8ead1] md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)] md:grid-rows-1 dark:bg-[#1b0c07]"
-    >
-      <aside
-        class="flex min-h-0 flex-col border-b border-[#c7854b]/45 bg-[radial-gradient(circle_at_0_0,_rgb(255_238_196_/_0.9),_transparent_45%),linear-gradient(160deg,_#f8ead1,_#f1d4a1)] dark:border-[#743f27] dark:bg-[radial-gradient(circle_at_0_0,_rgb(162_63_30_/_0.22),_transparent_45%),linear-gradient(160deg,_#241008,_#150704)] md:border-r md:border-b-0"
-      >
-        <header class="border-b border-[#c7854b]/45 px-5 py-5 dark:border-[#743f27]">
-          <p
-            class="m-0 font-mono text-[0.66rem] font-bold tracking-[0.2em] text-[#b54220] uppercase dark:text-[#ff956b]"
-          >
-            Taco index / result
-          </p>
-          <div class="mt-2 flex items-end justify-between gap-4">
-            <div>
-              <h1 class="m-0 font-serif text-3xl leading-none font-bold tracking-[-0.055em]">
-                検索結果
-              </h1>
-              <p class="mt-3 mb-0 text-xs leading-relaxed text-[#70432c] dark:text-[#e1ae8a]">
-                見つかった店を、地図と一緒に眺められます。
-              </p>
-            </div>
-            <span
-              id="count"
-              class="border border-[#ad572e]/45 bg-[#f6c54b] px-2 py-1 font-mono text-xs font-bold text-[#54210d] shadow-[2px_2px_0_rgb(87_32_13_/_0.22)]"
-              aria-live="polite"
-            >
-              —
-            </span>
-          </div>
-        </header>
-
-        <div
-          id="places"
-          class="min-h-0 flex-1 space-y-2 overflow-y-auto p-3"
-          aria-label="検索結果のレストラン"
-        >
-          <p
-            id="empty"
-            class="m-0 grid min-h-52 place-items-center border border-dashed border-[#b86536]/50 px-7 text-center font-serif text-xl font-bold"
-          >
-            検索結果を待っています。
-          </p>
-        </div>
-        <p id="status" class="sr-only" role="status">接続しています…</p>
-      </aside>
-
-      <section
-        id="viewer"
-        class="relative min-h-[22rem] min-w-0 overflow-hidden bg-[#dfc092] dark:bg-[#271007]"
-        aria-label="検索結果のレストラン地図"
-      >
-        <div
-          class="pointer-events-none absolute inset-x-0 top-0 z-10 h-1 bg-[linear-gradient(90deg,#bb4824_0_32%,#f2bd48_32%_63%,#3d7a5d_63%)]"
-        ></div>
-        <div
-          id="map"
-          class="absolute inset-0 size-full"
-          role="region"
-          aria-label="レストラン地図"
-        ></div>
-        <p
-          id="map-unavailable"
-          class="absolute inset-0 m-0 grid place-items-center px-8 text-center text-sm leading-relaxed text-[#70432c] dark:text-[#e1ae8a]"
-          hidden
-        >
-          地図を表示できません。
-        </p>
-      </section>
-    </main>
-    <script type="module" src="./restaurant-app-client.js"></script>
+  <body class="m-0 min-w-0 bg-taco-paper text-taco-ink">
+    <div id="app" data-tacos-rendered="false"></div>
+    <script type="module" src="./restaurant-app-client.tsx"></script>
   </body>
 </html>

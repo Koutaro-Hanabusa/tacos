@@ -76,6 +76,15 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.17
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      maplibre-gl:
+        specifier: ^5.23.0
+        version: 5.23.0
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -112,6 +121,12 @@ importers:
       maplibre-gl:
         specifier: ^5.23.0
         version: 5.23.0
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
       zod:
         specifier: 'catalog:'
         version: 4.3.6
@@ -128,6 +143,12 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.17
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
