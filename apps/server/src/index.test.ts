@@ -49,12 +49,19 @@ function bindings() {
   } as never;
 }
 
-function registrationForm(latitude = "35.683659", longitude = "139.754089") {
+function registrationForm(
+  latitude = "35.683659",
+  longitude = "139.754089",
+  rate = "4.5",
+  memo = "牛タンのタコスがよかった",
+) {
   const form = new FormData();
   form.set("name", "テスト店");
   form.set("address", "東京都千代田区千代田1-1");
   form.set("latitude", latitude);
   form.set("longitude", longitude);
+  form.set("rate", rate);
+  form.set("memo", memo);
   form.set(
     "photo",
     new File([new Uint8Array([0xff, 0xd8, 0xff])], "restaurant.jpg", {
@@ -110,6 +117,8 @@ describe("管理者向け店舗 API", () => {
         address: "東京都千代田区千代田1-1",
         latitude: 35.683659,
         longitude: 139.754089,
+        rate: 4.5,
+        memo: "牛タンのタコスがよかった",
       }),
     );
     expect(mocks.geocodeAddress).not.toHaveBeenCalled();
@@ -119,6 +128,17 @@ describe("管理者向け店舗 API", () => {
     const response = await app.request(
       "http://localhost/api/admin/restaurants",
       { method: "POST", body: registrationForm("91") },
+      bindings(),
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.add).not.toHaveBeenCalled();
+  });
+
+  it("登録時に5点を超える評価を拒否する", async () => {
+    const response = await app.request(
+      "http://localhost/api/admin/restaurants",
+      { method: "POST", body: registrationForm("35.683659", "139.754089", "5.5") },
       bindings(),
     );
 

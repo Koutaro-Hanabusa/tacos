@@ -8,6 +8,8 @@ export const restaurants = sqliteTable("restaurants", {
   latitude: real("latitude").notNull(),
   longitude: real("longitude").notNull(),
   imageKey: text("image_key").notNull(),
+  rate: real("rate"),
+  memo: text("memo"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
 });

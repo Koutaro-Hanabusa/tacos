@@ -2,16 +2,32 @@ import { describe, expect, it } from "vite-plus/test";
 import { addRestaurantInput, registerRestaurantInput } from "./restaurant";
 
 describe("restaurant input", () => {
-  it("登録 input は店名と住所だけを受け取る", () => {
+  it("登録 input は評価とメモを受け取る", () => {
     const input = registerRestaurantInput.parse({
       name: "テスト店",
       address: "東京都千代田区千代田1-1",
+      rate: 4.5,
+      memo: "牛タンがよかった",
     });
 
     expect(input).toEqual({
       name: "テスト店",
       address: "東京都千代田区千代田1-1",
+      rate: 4.5,
+      memo: "牛タンがよかった",
     });
+  });
+
+  it("評価は0.5〜5の0.5刻みに制限する", () => {
+    for (const rate of [0, 5.5, 3.25]) {
+      expect(
+        registerRestaurantInput.safeParse({
+          name: "テスト店",
+          address: "東京都千代田区千代田1-1",
+          rate,
+        }).success,
+      ).toBe(false);
+    }
   });
 
   it("保存 input は位置情報と画像キーを必須にする", () => {
@@ -26,6 +42,7 @@ describe("restaurant input", () => {
       addRestaurantInput.safeParse({
         name: "テスト店",
         address: "東京都千代田区千代田1-1",
+        rate: 4.5,
         latitude: 35.683659,
         longitude: 139.754089,
         imageKey: "restaurants/example.webp",

@@ -7,6 +7,12 @@ export type Db = DrizzleD1Database<typeof schema>;
 
 type RestaurantRow = typeof schema.restaurants.$inferSelect;
 
+export const restaurantRateInput = z
+  .number()
+  .min(0.5)
+  .max(5)
+  .refine((value) => Number.isInteger(value * 2), "評価は0.5刻みで指定してください。");
+
 export type PublicRestaurant = Omit<RestaurantRow, "imageKey"> & {
   googleMapsUrl: string;
   photoUrl: string;
@@ -19,6 +25,8 @@ type RestaurantApiOptions = {
 export const registerRestaurantInput = z.object({
   name: z.string().trim().min(1).max(120),
   address: z.string().trim().min(1).max(300),
+  rate: restaurantRateInput,
+  memo: z.string().trim().max(1000).optional(),
 });
 
 export const addRestaurantInput = registerRestaurantInput.extend({
@@ -59,6 +67,8 @@ export class RestaurantApi {
         latitude: input.latitude,
         longitude: input.longitude,
         imageKey: input.imageKey,
+        rate: input.rate,
+        memo: input.memo,
       })
       .returning();
     return result[0];
