@@ -14,11 +14,12 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const addressRef = useRef(address);
-  const [rate, setRate] = useState<number | null>(null);
+  const [rateInput, setRateInput] = useState("");
   const [memo, setMemo] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [geocodedAddress, setGeocodedAddress] = useState<GeocodedAddress | null>(null);
   const normalizedAddress = address.trim();
+  const rate = rateInput.trim() === "" ? null : Number(rateInput);
   const coordinates = geocodedAddress?.address === normalizedAddress ? geocodedAddress : null;
   const geocoding = useGeocodeAddressMutation();
   const registration = useRegisterRestaurantMutation();
@@ -54,8 +55,8 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
       toast.error("写真を1枚選んでください。");
       return;
     }
-    if (!rate) {
-      toast.error("お店の評価を選んでください。");
+    if (rate === null || !Number.isFinite(rate) || rate < 0 || rate > 5) {
+      toast.error("お店の評価を0〜5で入力してください。");
       return;
     }
 
@@ -88,10 +89,11 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
     normalizedAddress,
     photo,
     rate,
+    rateInput,
     register,
     setMemo,
     setName,
     setPhoto,
-    setRate,
+    setRateInput,
   };
 }

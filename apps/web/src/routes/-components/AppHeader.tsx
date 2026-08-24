@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { ExternalLink, Menu, X } from "lucide-react";
 
 const links = [{ to: "/", label: "Map" }] as const;
+const suggestionIssuesUrl = "https://github.com/Koutaro-Hanabusa/tacos/issues";
 
 export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,6 +47,17 @@ export function AppHeader() {
               {label}
             </Link>
           ))}
+          <a
+            aria-label="GitHub Issuesで行ってみてほしい店を教える"
+            className="inline-flex items-center gap-1.5 font-medium text-sm text-taco-ink-soft transition-colors hover:text-taco-roja-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-taco-roja-strong"
+            href={suggestionIssuesUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+            onClick={closeMenu}
+          >
+            <span>GitHub</span>
+            <ExternalLink aria-hidden="true" className="size-3.5" />
+          </a>
         </nav>
 
         <button

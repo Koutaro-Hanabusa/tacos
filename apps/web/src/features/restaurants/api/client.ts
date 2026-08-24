@@ -7,12 +7,7 @@ const restaurantSchema = z.object({
   address: z.string(),
   latitude: z.number(),
   longitude: z.number(),
-  rate: z
-    .number()
-    .min(0.5)
-    .max(5)
-    .refine((value) => Number.isInteger(value * 2))
-    .nullable(),
+  rate: z.number().min(0).max(5).nullable(),
   memo: z.string().nullable(),
   googleMapsUrl: z.string(),
   photoUrl: z.string(),

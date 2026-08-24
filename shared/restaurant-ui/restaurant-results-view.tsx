@@ -41,7 +41,9 @@ export function RestaurantResultsView({
               <h1 className="m-0 text-3xl leading-none font-extrabold tracking-[-0.04em]">
                 {title}
               </h1>
-              <p className="mt-3 mb-0 text-sm leading-relaxed text-taco-muted">{description}</p>
+              <p className="mt-3 mb-0 whitespace-pre-line text-sm leading-relaxed text-taco-muted">
+                {description}
+              </p>
             </div>
           </div>
         </header>

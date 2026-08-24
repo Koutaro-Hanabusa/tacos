@@ -44,9 +44,6 @@ export function RestaurantForm({ onRegistered }: Props) {
       <form className="p-5 font-sans text-base sm:p-7" onSubmit={handleSubmit}>
         <div className="flex items-start justify-between gap-5 border-b border-taco-border/60 pb-5">
           <div>
-            <p className="text-xs font-bold tracking-[0.12em] text-taco-roja-strong uppercase">
-              New place
-            </p>
             <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">お店を登録</h2>
           </div>
           <span className="grid size-9 place-items-center border border-taco-lime/60 bg-taco-lime text-taco-ink">
@@ -159,16 +156,11 @@ export function RestaurantForm({ onRegistered }: Props) {
                   className="h-12 w-24 border-taco-border bg-taco-surface-raised text-center font-mono text-xl font-bold"
                   id="restaurant-rate"
                   inputMode="decimal"
-                  max={5}
-                  min={0.5}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    form.setRate(value === "" ? null : Number(value));
-                  }}
+                  onChange={(event) => form.setRateInput(event.target.value)}
+                  placeholder="5"
                   required
-                  step={0.5}
-                  type="number"
-                  value={form.rate ?? ""}
+                  type="text"
+                  value={form.rateInput}
                 />
                 <span className="text-sm font-semibold text-taco-ink-soft">/ 5</span>
               </div>

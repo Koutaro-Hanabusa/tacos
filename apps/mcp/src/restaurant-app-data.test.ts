@@ -45,6 +45,16 @@ describe("restaurant app data", () => {
     ).toHaveLength(1);
   });
 
+  test("preserves fractional ratings without rounding", () => {
+    expect(
+      normalizeRestaurantResult({
+        structuredContent: {
+          restaurants: [{ ...restaurant, rate: 4.25 }],
+        },
+      })[0]?.rate,
+    ).toBe(4.25);
+  });
+
   test("extracts an MCP error message", () => {
     expect(
       restaurantResultError({ content: [{ type: "text", text: "検索APIが応答しませんでした。" }] }),
