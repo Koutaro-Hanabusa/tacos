@@ -6,23 +6,19 @@ import {
   useRestaurantsPageQuery,
 } from "@/features/restaurants/api/queries";
 import { useRestaurantSelection } from "@/features/restaurants/hooks/use-restaurant-selection";
-import { useMediaQuery } from "@/hooks/use-media-query";
 
 export function HomePage() {
   const navigate = useNavigate({ from: "/" });
   const search = useSearch({ from: "/" });
   const requestedPage = Math.max(0, (search.page ?? 1) - 1);
-  const isMobile = useMediaQuery("(max-width: 1023px)");
   const pageQuery = useRestaurantsPageQuery(requestedPage);
-  const mapQuery = useRestaurantsMapQuery(isMobile);
+  const mapQuery = useRestaurantsMapQuery();
   const page = pageQuery.data ?? { page: requestedPage, restaurants: [], total: 0 };
-  const restaurants = isMobile ? (mapQuery.data?.restaurants ?? []) : page.restaurants;
-  const total = isMobile ? (mapQuery.data?.total ?? 0) : page.total;
-  const activeQuery = isMobile ? mapQuery : pageQuery;
-  const selection = useRestaurantSelection(restaurants, {
-    fallbackToFirst: true,
+  const mapRestaurants = mapQuery.data?.restaurants ?? page.restaurants;
+  const selection = useRestaurantSelection(page.restaurants, {
+    allRestaurants: mapRestaurants,
     pageSize: RESTAURANT_PAGE_SIZE,
-    syncPage: isMobile,
+    syncPage: true,
   });
 
   function setPage(nextPage: number) {
@@ -50,21 +46,22 @@ export function HomePage() {
       emptyDescription="最初の店を記録すると、ここに写真と位置が並びます。"
       emptyTitle="まだ一軒もありません。"
       errorMessage={
-        activeQuery.error instanceof Error
-          ? activeQuery.error.message
+        pageQuery.error instanceof Error
+          ? pageQuery.error.message
           : "登録済みのお店を取得できませんでした。"
       }
-      onClearSelection={isMobile ? clearSelection : undefined}
+      mapRestaurants={mapRestaurants}
+      onClearSelection={clearSelection}
       onSelect={selection.selectRestaurant}
-      onPageChange={isMobile ? undefined : setPage}
+      onPageChange={setPage}
       page={page.page}
-      pageLoading={activeQuery.isFetching && !activeQuery.isError}
+      pageLoading={pageQuery.isFetching && !pageQuery.isError}
       pageSize={RESTAURANT_PAGE_SIZE}
-      restaurants={restaurants}
+      restaurants={page.restaurants}
       selectedId={selection.selectedRestaurantId}
-      status={activeQuery.isPending ? "loading" : activeQuery.isError ? "error" : "ready"}
+      status={pageQuery.isPending ? "loading" : pageQuery.isError ? "error" : "ready"}
       title="全人類タコスを食え！！！！！！"
-      totalCount={isMobile ? undefined : total}
+      totalCount={page.total}
     />
   );
 }

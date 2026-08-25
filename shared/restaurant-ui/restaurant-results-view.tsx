@@ -8,6 +8,7 @@ import type { RestaurantResultsViewProps } from "./types";
 
 export function RestaurantResultsView({
   restaurants,
+  mapRestaurants,
   selectedId,
   onSelect,
   title,
@@ -25,10 +26,16 @@ export function RestaurantResultsView({
   onPageChange,
   pageLoading = false,
 }: RestaurantResultsViewProps) {
-  const markers = useMemo(() => toRestaurantMarkers(restaurants), [restaurants]);
+  const markers = useMemo(
+    () => toRestaurantMarkers(mapRestaurants ?? restaurants),
+    [mapRestaurants, restaurants],
+  );
   const selectedRestaurant = useMemo(
-    () => (selectedId === undefined ? undefined : restaurants.find(({ id }) => id === selectedId)),
-    [restaurants, selectedId],
+    () =>
+      selectedId === undefined
+        ? undefined
+        : (mapRestaurants ?? restaurants).find(({ id }) => id === selectedId),
+    [mapRestaurants, restaurants, selectedId],
   );
   const resultsRef = useRef<HTMLDivElement>(null);
 

@@ -38,6 +38,7 @@ export interface RestaurantListItemProps {
 
 export interface RestaurantResultsViewProps {
   restaurants: RestaurantViewData[];
+  mapRestaurants?: RestaurantViewData[];
   selectedId?: number;
   onSelect: (id: number) => void;
   title: ReactNode;
