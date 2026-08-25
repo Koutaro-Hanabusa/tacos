@@ -41,10 +41,10 @@ export const listRestaurantInput = z.object({
   offset: z.number().int().min(0).optional().default(0),
 });
 
-export function googleMapsUrl(latitude: number, longitude: number) {
+export function googleMapsUrl(name: string, address: string) {
   const url = new URL("https://www.google.com/maps/search/");
   url.searchParams.set("api", "1");
-  url.searchParams.set("query", `${latitude},${longitude}`);
+  url.searchParams.set("query", `${name}, ${address}`);
   return url.toString();
 }
 
@@ -129,7 +129,7 @@ export class RestaurantApi {
 
     return {
       ...publicRestaurant,
-      googleMapsUrl: googleMapsUrl(restaurant.latitude, restaurant.longitude),
+      googleMapsUrl: googleMapsUrl(restaurant.name, restaurant.address),
       photoUrl: this.photoUrl(restaurant.id),
     };
   }

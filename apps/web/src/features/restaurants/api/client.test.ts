@@ -23,7 +23,8 @@ const restaurant = {
   longitude: 139.706,
   rate: 4.5,
   memo: "カルニタスがよかった",
-  googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=35.671%2C139.706",
+  googleMapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Taquer%C3%ADa+El+Sol%2C+%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%8B%E8%B0%B7%E5%8C%BA%E7%A5%9E%E5%AE%AE%E5%89%8D+1-2-3",
   photoUrl: "https://api.example.test/photos/1",
   createdAt: null,
   updatedAt: null,

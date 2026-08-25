@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vite-plus/test";
-import { addRestaurantInput, registerRestaurantInput } from "./restaurant";
+import { addRestaurantInput, googleMapsUrl, registerRestaurantInput } from "./restaurant";
 
 describe("restaurant input", () => {
+  it("Google Maps は店名と住所で検索する", () => {
+    const url = new URL(googleMapsUrl("タコス屋", "東京都渋谷区神宮前1-2-3"));
+
+    expect(url.searchParams.get("api")).toBe("1");
+    expect(url.searchParams.get("query")).toBe("タコス屋, 東京都渋谷区神宮前1-2-3");
+  });
+
   it("登録 input は評価とメモを受け取る", () => {
     const input = registerRestaurantInput.parse({
       name: "テスト店",
