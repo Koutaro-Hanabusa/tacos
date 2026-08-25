@@ -11,6 +11,7 @@ import {
   listRestaurants,
   listRestaurantsPage,
   registerRestaurant,
+  updateRestaurant,
 } from "./client";
 
 const fetchMock = vi.fn();
@@ -148,5 +149,34 @@ describe("restaurant API client", () => {
       method: "DELETE",
       credentials: "include",
     });
+  });
+
+  it("更新は認証情報付き PATCH で店舗情報を送る", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ restaurant }));
+
+    await expect(
+      updateRestaurant({
+        id: restaurant.id,
+        name: restaurant.name,
+        address: restaurant.address,
+        latitude: restaurant.latitude,
+        longitude: restaurant.longitude,
+        rate: restaurant.rate ?? 0,
+        memo: restaurant.memo ?? "",
+      }),
+    ).resolves.toEqual(restaurant);
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const formData = options.body as FormData;
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.test/api/admin/restaurants/1",
+      expect.objectContaining({ method: "PATCH", credentials: "include" }),
+    );
+    expect(formData.get("name")).toBe(restaurant.name);
+    expect(formData.get("latitude")).toBe("35.671");
+    expect(formData.get("longitude")).toBe("139.706");
+    expect(formData.get("rate")).toBe("4.5");
+    expect(formData.get("memo")).toBe("カルニタスがよかった");
+    expect(formData.get("photo")).toBeNull();
   });
 });

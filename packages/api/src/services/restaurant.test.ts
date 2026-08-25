@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
-import { addRestaurantInput, googleMapsUrl, registerRestaurantInput } from "./restaurant";
+import {
+  addRestaurantInput,
+  googleMapsUrl,
+  registerRestaurantInput,
+  updateRestaurantInput,
+} from "./restaurant";
 
 describe("restaurant input", () => {
   it("Google Maps は店名と住所で検索する", () => {
@@ -69,6 +74,19 @@ describe("restaurant input", () => {
         latitude: 35.683659,
         longitude: 139.754089,
         imageKey: "restaurants/example.webp",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("更新 input は写真なしで受け付ける", () => {
+    expect(
+      updateRestaurantInput.safeParse({
+        name: "更新店",
+        address: "東京都渋谷区神宮前2-2",
+        rate: 3.5,
+        latitude: 35.67,
+        longitude: 139.7,
+        memo: "更新したメモ",
       }).success,
     ).toBe(true);
   });
