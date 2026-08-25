@@ -33,6 +33,7 @@ export interface RestaurantListItemProps {
   selected: boolean;
   onSelect: (id: number) => void;
   onOpenLink?: (url: string) => void;
+  onClose?: () => void;
 }
 
 export interface RestaurantResultsViewProps {
@@ -47,6 +48,7 @@ export interface RestaurantResultsViewProps {
   errorMessage?: string;
   embedded?: boolean;
   onOpenLink?: (url: string) => void;
+  onClearSelection?: () => void;
   totalCount?: number;
   page?: number;
   pageSize?: number;

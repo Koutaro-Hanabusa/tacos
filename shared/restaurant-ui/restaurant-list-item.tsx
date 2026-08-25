@@ -9,6 +9,7 @@ export function RestaurantListItem({
   selected,
   onSelect,
   onOpenLink,
+  onClose,
 }: RestaurantListItemProps) {
   const [imageFailed, setImageFailed] = useState(false);
   const [isPhotoPreviewOpen, setIsPhotoPreviewOpen] = useState(false);
@@ -29,14 +30,26 @@ export function RestaurantListItem({
 
   return (
     <article
-      className={`place group w-full overflow-hidden rounded-md border transition-colors ${
+      className={`place group relative w-full overflow-hidden rounded-md border transition-colors ${
         selected
           ? "border-taco-roja bg-taco-surface-raised"
           : "border-taco-border/60 bg-taco-surface/70 hover:border-taco-roja/70 hover:bg-taco-surface-raised"
       }`}
       data-id={restaurant.id}
     >
-      <div className="place-select flex w-full items-start gap-3 p-3">
+      {onClose ? (
+        <Button
+          aria-label="選択を解除"
+          className="absolute top-2 right-2 z-10 grid size-8 place-items-center rounded-full border border-taco-border bg-taco-paper-bright text-xl leading-none font-semibold text-taco-ink"
+          onClick={onClose}
+          type="button"
+          unstyled
+        >
+          ×
+        </Button>
+      ) : null}
+
+      <div className={`place-select flex w-full items-start gap-3 p-3 ${onClose ? "pr-12" : ""}`}>
         {imageUrl && !imageFailed ? (
           <Button
             aria-label={`写真を拡大: ${restaurant.name || "名前のないレストラン"}`}

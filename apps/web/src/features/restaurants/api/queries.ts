@@ -3,6 +3,7 @@ import { keepPreviousData, queryOptions, useQuery, useSuspenseQuery } from "@tan
 import { listRestaurants, listRestaurantsPage } from "./client";
 
 export const RESTAURANT_PAGE_SIZE = 10;
+export const RESTAURANT_MAP_LIMIT = 100;
 
 export const restaurantKeys = {
   all: ["restaurants"] as const,
@@ -27,6 +28,13 @@ export function restaurantsPageQueryOptions(page: number) {
   });
 }
 
+export function restaurantsMapQueryOptions() {
+  return queryOptions({
+    queryKey: [...restaurantKeys.all, "map"] as const,
+    queryFn: () => listRestaurantsPage({ limit: RESTAURANT_MAP_LIMIT, offset: 0 }),
+  });
+}
+
 export function useRestaurantsQuery() {
   return useQuery(restaurantsQueryOptions);
 }
@@ -37,4 +45,8 @@ export function useSuspenseRestaurantsQuery() {
 
 export function useRestaurantsPageQuery(page: number) {
   return useQuery(restaurantsPageQueryOptions(page));
+}
+
+export function useRestaurantsMapQuery(enabled = true) {
+  return useQuery({ ...restaurantsMapQueryOptions(), enabled });
 }

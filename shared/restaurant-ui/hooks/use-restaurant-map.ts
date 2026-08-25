@@ -47,7 +47,7 @@ export function useRestaurantMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const maplibreRef = useRef<typeof maplibregl | null>(null);
   const markerRefs = useRef(new Map<number, MarkerReference>());
-  const didFitInitialMarkers = useRef(false);
+  const fittedMarkerSetKey = useRef<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapFailed, setMapFailed] = useState(false);
 
@@ -158,8 +158,16 @@ export function useRestaurantMap({
       markerRefs.current.set(marker.id, { element, marker: mapMarker });
     });
 
-    if (markers.length === 0 || didFitInitialMarkers.current) return;
-    didFitInitialMarkers.current = true;
+    const markerSetKey = markers
+      .map(({ id }) => id)
+      .sort((left, right) => left - right)
+      .join(",");
+    if (markers.length === 0) {
+      fittedMarkerSetKey.current = null;
+      return;
+    }
+    if (fittedMarkerSetKey.current === markerSetKey) return;
+    fittedMarkerSetKey.current = markerSetKey;
 
     if (markers.length === 1) {
       const marker = markers[0];
