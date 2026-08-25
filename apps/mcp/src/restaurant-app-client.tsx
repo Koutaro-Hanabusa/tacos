@@ -9,8 +9,8 @@ function McpAppBridge({ app }: { app: App }) {
 
   return (
     <RestaurantResultsView
-      description="タコス大好きおじさんのぶりおによるタコスマップMCP"
-      emptyDescription="検索条件を変えると、ここに写真と位置が並びます。"
+      description="会話で指定した条件に合うタコス店を、写真・一覧・地図で確認できます。"
+      emptyDescription="店名や地域を変えて、もう一度検索を依頼してください。"
       emptyTitle="条件に合う店はありません。"
       embedded
       errorMessage={view.errorMessage}
@@ -19,7 +19,7 @@ function McpAppBridge({ app }: { app: App }) {
       restaurants={view.restaurants}
       selectedId={view.selectedId}
       status={view.status}
-      title="検索結果"
+      title="タコス店の検索結果"
     />
   );
 }

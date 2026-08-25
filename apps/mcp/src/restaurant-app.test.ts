@@ -110,6 +110,19 @@ describe("restaurant MCP App", () => {
     expect(server).not.toContain("GOOGLE_MAPS_EMBED_API_KEY");
   });
 
+  test("describes clear firing boundaries for the restaurant tools", () => {
+    const server = source("./index.ts");
+
+    expect(server).toContain("name または address を少なくとも1つ指定すること");
+    expect(server).toContain(
+      "条件なしで登録済み店舗を一覧・地図表示したい場合は restaurant_list を使う",
+    );
+    expect(server).toContain("検索条件がある場合は restaurant_search を使う");
+    expect(server).toContain("検索結果に含まれる店舗IDを指定して");
+    expect(server).toContain("readOnlyHint: true");
+    expect(server).toContain("outputSchema: restaurantResultOutput");
+  });
+
   test("keeps MCP rendering on the shared client bundle", () => {
     const infra = source("../../../packages/infra/alchemy.run.ts");
     const scripts = source("../../../packages/infra/package.json");
