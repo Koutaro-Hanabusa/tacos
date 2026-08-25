@@ -1,13 +1,18 @@
-import { LoaderCircle, MapPin, Trash2 } from "lucide-react";
+import { LoaderCircle, MapPin, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import { Button, DangerButton } from "@/components/ui/button";
 import { useRestaurantsQuery } from "@/features/restaurants/api/queries";
+import { RestaurantForm } from "@/features/restaurants/components/restaurant-form";
 import { useRestaurantDeletion } from "@/features/restaurants/hooks/use-restaurant-deletion";
 
 export function SavedRestaurantList() {
   const restaurantsQuery = useRestaurantsQuery();
   const restaurants = restaurantsQuery.data ?? [];
   const deletion = useRestaurantDeletion();
+  const [restaurantToEdit, setRestaurantToEdit] = useState<(typeof restaurants)[number] | null>(
+    null,
+  );
 
   return (
     <section className="overflow-hidden rounded-lg border border-taco-border bg-taco-surface">
@@ -46,6 +51,19 @@ export function SavedRestaurantList() {
           <ul className="space-y-2">
             {restaurants.map((restaurant) => {
               const isDeleteConfirmationOpen = deletion.restaurantToDelete?.id === restaurant.id;
+              const isEditOpen = restaurantToEdit?.id === restaurant.id;
+
+              if (isEditOpen) {
+                return (
+                  <li key={restaurant.id}>
+                    <RestaurantForm
+                      onCancel={() => setRestaurantToEdit(null)}
+                      onRegistered={() => setRestaurantToEdit(null)}
+                      restaurant={restaurant}
+                    />
+                  </li>
+                );
+              }
 
               return (
                 <li
@@ -73,17 +91,34 @@ export function SavedRestaurantList() {
                       ) : null}
                     </div>
                     {!isDeleteConfirmationOpen ? (
-                      <DangerButton
-                        aria-label={`${restaurant.name}を削除する`}
-                        className="h-9 shrink-0 px-2 text-sm"
-                        disabled={deletion.isDeleting}
-                        onClick={() => deletion.requestDeletion(restaurant)}
-                        size="sm"
-                        type="button"
-                      >
-                        <Trash2 className="size-3.5" />
-                        削除
-                      </DangerButton>
+                      <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                        <Button
+                          aria-label={`${restaurant.name}を編集する`}
+                          className="h-9 px-2 text-sm"
+                          disabled={deletion.isDeleting}
+                          onClick={() => {
+                            deletion.cancelDeletion();
+                            setRestaurantToEdit(restaurant);
+                          }}
+                          size="sm"
+                          type="button"
+                          variant="secondary"
+                        >
+                          <Pencil className="size-3.5" />
+                          編集
+                        </Button>
+                        <DangerButton
+                          aria-label={`${restaurant.name}を削除する`}
+                          className="h-9 px-2 text-sm"
+                          disabled={deletion.isDeleting}
+                          onClick={() => deletion.requestDeletion(restaurant)}
+                          size="sm"
+                          type="button"
+                        >
+                          <Trash2 className="size-3.5" />
+                          削除
+                        </DangerButton>
+                      </div>
                     ) : null}
                   </div>
 

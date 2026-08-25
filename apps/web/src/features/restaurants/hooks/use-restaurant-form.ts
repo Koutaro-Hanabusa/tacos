@@ -1,28 +1,44 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { Coordinates } from "../api/client";
-import { useGeocodeAddressMutation, useRegisterRestaurantMutation } from "../api/mutations";
+import type { Coordinates, Restaurant } from "../api/client";
+import {
+  useGeocodeAddressMutation,
+  useRegisterRestaurantMutation,
+  useUpdateRestaurantMutation,
+} from "../api/mutations";
 
 type GeocodedAddress = Coordinates & { address: string };
 
 interface UseRestaurantFormOptions {
   onRegistered: () => Promise<void> | void;
+  restaurant?: Restaurant;
 }
 
-export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+export function useRestaurantForm({ onRegistered, restaurant }: UseRestaurantFormOptions) {
+  const [name, setName] = useState(() => restaurant?.name ?? "");
+  const [address, setAddress] = useState(() => restaurant?.address ?? "");
   const addressRef = useRef(address);
-  const [rateInput, setRateInput] = useState("");
-  const [memo, setMemo] = useState("");
+  const [rateInput, setRateInput] = useState(() =>
+    restaurant?.rate === null || restaurant?.rate === undefined ? "" : String(restaurant.rate),
+  );
+  const [memo, setMemo] = useState(() => restaurant?.memo ?? "");
   const [photo, setPhoto] = useState<File | null>(null);
-  const [geocodedAddress, setGeocodedAddress] = useState<GeocodedAddress | null>(null);
+  const [geocodedAddress, setGeocodedAddress] = useState<GeocodedAddress | null>(() =>
+    restaurant
+      ? {
+          address: restaurant.address,
+          latitude: restaurant.latitude,
+          longitude: restaurant.longitude,
+        }
+      : null,
+  );
   const normalizedAddress = address.trim();
   const rate = rateInput.trim() === "" ? null : Number(rateInput);
   const coordinates = geocodedAddress?.address === normalizedAddress ? geocodedAddress : null;
   const geocoding = useGeocodeAddressMutation();
   const registration = useRegisterRestaurantMutation();
+  const updating = useUpdateRestaurantMutation();
 
   function changeAddress(nextAddress: string) {
     addressRef.current = nextAddress;
@@ -51,7 +67,7 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
       toast.error("住所を検索して、位置を確認してください。");
       return;
     }
-    if (!photo) {
+    if (!restaurant && !photo) {
       toast.error("写真を1枚選んでください。");
       return;
     }
@@ -61,19 +77,39 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
     }
 
     try {
-      await registration.mutateAsync({
-        name,
-        address: normalizedAddress,
-        latitude: coordinates.latitude,
-        longitude: coordinates.longitude,
-        rate,
-        memo: memo.trim(),
-        photo,
-      });
-      toast.success("店を地図に追加しました。");
+      if (restaurant) {
+        await updating.mutateAsync({
+          id: restaurant.id,
+          name,
+          address: normalizedAddress,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          rate,
+          memo: memo.trim(),
+          photo: photo ?? undefined,
+        });
+        toast.success("店の情報を更新しました。");
+      } else if (photo) {
+        await registration.mutateAsync({
+          name,
+          address: normalizedAddress,
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          rate,
+          memo: memo.trim(),
+          photo,
+        });
+        toast.success("店を地図に追加しました。");
+      }
       await onRegistered();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "登録に失敗しました。");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : restaurant
+            ? "更新に失敗しました。"
+            : "登録に失敗しました。",
+      );
     }
   }
 
@@ -84,6 +120,7 @@ export function useRestaurantForm({ onRegistered }: UseRestaurantFormOptions) {
     geocode,
     isGeocoding: geocoding.isPending,
     isRegistering: registration.isPending,
+    isSaving: registration.isPending || updating.isPending,
     memo,
     name,
     normalizedAddress,

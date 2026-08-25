@@ -6,9 +6,11 @@ const mocks = vi.hoisted(() => ({
   delete: vi.fn(),
   geocodeAddress: vi.fn(),
   get: vi.fn(),
+  getRecord: vi.fn(),
   list: vi.fn(),
   photoDelete: vi.fn(),
   photoPut: vi.fn(),
+  update: vi.fn(),
 }));
 
 vi.mock("drizzle-orm/d1", () => ({
@@ -27,7 +29,9 @@ vi.mock("@tacos/api/services/restaurant", async (importOriginal) => {
     count = mocks.count;
     delete = mocks.delete;
     get = mocks.get;
+    getRecord = mocks.getRecord;
     list = mocks.list;
+    update = mocks.update;
   }
 
   return { ...actual, RestaurantApi };
@@ -72,6 +76,17 @@ function registrationForm(
       type: "image/jpeg",
     }),
   );
+  return form;
+}
+
+function updateForm() {
+  const form = new FormData();
+  form.set("name", "更新店");
+  form.set("address", "東京都渋谷区神宮前2-2");
+  form.set("latitude", "35.67");
+  form.set("longitude", "139.7");
+  form.set("rate", "3.5");
+  form.set("memo", "更新したメモ");
   return form;
 }
 
@@ -198,6 +213,59 @@ describe("管理者向け店舗 API", () => {
         restaurantId: 7,
       }),
     );
+  });
+
+  it("店舗情報を更新する", async () => {
+    mocks.getRecord.mockResolvedValue({ id: 7, imageKey: "restaurants/7.jpg" });
+    mocks.update.mockResolvedValue({ id: 7, name: "更新店" });
+
+    const response = await app.request(
+      "http://localhost/api/admin/restaurants/7",
+      { method: "PATCH", body: updateForm() },
+      bindings(),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ restaurant: { id: 7, name: "更新店" } });
+    expect(mocks.update).toHaveBeenCalledWith(7, {
+      address: "東京都渋谷区神宮前2-2",
+      latitude: 35.67,
+      longitude: 139.7,
+      memo: "更新したメモ",
+      name: "更新店",
+      rate: 3.5,
+    });
+    expect(mocks.photoPut).not.toHaveBeenCalled();
+  });
+
+  it("写真を差し替えて旧写真を削除する", async () => {
+    mocks.getRecord.mockResolvedValue({ id: 7, imageKey: "restaurants/old.jpg" });
+    mocks.update.mockResolvedValue({ id: 7, name: "更新店" });
+    const form = updateForm();
+    form.set(
+      "photo",
+      new File([new Uint8Array([0xff, 0xd8, 0xff])], "new.jpg", { type: "image/jpeg" }),
+    );
+
+    const response = await app.request(
+      "http://localhost/api/admin/restaurants/7",
+      { method: "PATCH", body: form },
+      bindings(),
+    );
+
+    expect(response.status).toBe(200);
+    expect(mocks.photoPut).toHaveBeenCalledWith(
+      expect.stringMatching(/^restaurants\/.+\.jpg$/),
+      expect.any(Uint8Array),
+      expect.objectContaining({
+        httpMetadata: expect.objectContaining({ contentType: "image/jpeg" }),
+      }),
+    );
+    expect(mocks.update).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({ imageKey: expect.stringMatching(/^restaurants\/.+\.jpg$/) }),
+    );
+    expect(mocks.photoDelete).toHaveBeenCalledWith("restaurants/old.jpg");
   });
 });
 

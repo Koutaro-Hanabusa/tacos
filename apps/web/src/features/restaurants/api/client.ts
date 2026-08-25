@@ -115,6 +115,35 @@ export async function registerRestaurant(input: {
   return restaurantResponse.parse(await response.json()).restaurant;
 }
 
+export async function updateRestaurant(input: {
+  id: number;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  rate: number;
+  memo: string;
+  photo?: File;
+}) {
+  const formData = new FormData();
+  formData.set("name", input.name);
+  formData.set("address", input.address);
+  formData.set("latitude", String(input.latitude));
+  formData.set("longitude", String(input.longitude));
+  formData.set("rate", String(input.rate));
+  formData.set("memo", input.memo);
+  if (input.photo) formData.set("photo", input.photo);
+
+  const response = await fetch(endpoint(`/api/admin/restaurants/${input.id}`), {
+    method: "PATCH",
+    body: formData,
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error(await responseError(response));
+
+  return restaurantResponse.parse(await response.json()).restaurant;
+}
+
 export async function deleteRestaurant(id: number) {
   const response = await fetch(endpoint(`/api/admin/restaurants/${id}`), {
     method: "DELETE",

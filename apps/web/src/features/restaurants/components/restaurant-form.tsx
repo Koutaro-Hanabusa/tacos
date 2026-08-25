@@ -6,8 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRestaurantForm } from "@/features/restaurants/hooks/use-restaurant-form";
 
+import type { Restaurant } from "../api/client";
+
 interface Props {
   onRegistered: () => Promise<void> | void;
+  onCancel?: () => void;
+  restaurant?: Restaurant;
 }
 
 function RequiredBadge() {
@@ -18,9 +22,12 @@ function RequiredBadge() {
   );
 }
 
-export function RestaurantForm({ onRegistered }: Props) {
-  const form = useRestaurantForm({ onRegistered });
+export function RestaurantForm({ onCancel, onRegistered, restaurant }: Props) {
+  const isEditing = Boolean(restaurant);
+  const fieldIdPrefix = isEditing ? "edit-" : "";
+  const form = useRestaurantForm({ onRegistered, restaurant });
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
+  const photoUrl = photoPreviewUrl ?? restaurant?.photoUrl ?? null;
 
   useEffect(() => {
     if (!form.photo) {
@@ -44,7 +51,9 @@ export function RestaurantForm({ onRegistered }: Props) {
       <form className="p-5 font-sans text-base sm:p-7" onSubmit={handleSubmit}>
         <div className="flex items-start justify-between gap-5 border-b border-taco-border/60 pb-5">
           <div>
-            <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">お店を登録</h2>
+            <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">
+              {isEditing ? "お店を編集" : "お店を登録"}
+            </h2>
           </div>
           <span className="grid size-9 place-items-center border border-taco-lime/60 bg-taco-lime text-taco-ink">
             <MapPin className="size-4" />
@@ -55,14 +64,14 @@ export function RestaurantForm({ onRegistered }: Props) {
           <div className="space-y-2">
             <Label
               className="text-sm font-semibold tracking-normal text-taco-ink-soft"
-              htmlFor="restaurant-name"
+              htmlFor={`${fieldIdPrefix}restaurant-name`}
             >
               店名 <RequiredBadge />
             </Label>
             <Input
               autoComplete="organization"
               className="h-12 border-taco-border bg-taco-paper-bright px-3 text-base placeholder:text-taco-muted"
-              id="restaurant-name"
+              id={`${fieldIdPrefix}restaurant-name`}
               maxLength={120}
               onChange={(event) => form.setName(event.target.value)}
               placeholder="例: Taquería El Sol"
@@ -74,7 +83,7 @@ export function RestaurantForm({ onRegistered }: Props) {
           <div className="space-y-2">
             <Label
               className="text-sm font-semibold tracking-normal text-taco-ink-soft"
-              htmlFor="restaurant-address"
+              htmlFor={`${fieldIdPrefix}restaurant-address`}
             >
               住所 <RequiredBadge />
             </Label>
@@ -82,7 +91,7 @@ export function RestaurantForm({ onRegistered }: Props) {
               <Input
                 autoComplete="street-address"
                 className="h-12 border-taco-border bg-taco-paper-bright px-3 text-base placeholder:text-taco-muted"
-                id="restaurant-address"
+                id={`${fieldIdPrefix}restaurant-address`}
                 maxLength={300}
                 onChange={(event) => form.changeAddress(event.target.value)}
                 placeholder="例: 東京都渋谷区神宮前 1-2-3"
@@ -131,7 +140,8 @@ export function RestaurantForm({ onRegistered }: Props) {
                     </div>
                   </dl>
                   <p className="mt-2 text-sm leading-relaxed text-taco-muted">
-                    この位置で登録します。住所を変更すると、もう一度検索が必要です。
+                    この位置で{isEditing ? "更新" : "登録"}
+                    します。住所を変更すると、もう一度検索が必要です。
                   </p>
                 </>
               ) : (
@@ -146,7 +156,7 @@ export function RestaurantForm({ onRegistered }: Props) {
             <div className="space-y-2">
               <Label
                 className="text-sm font-semibold tracking-normal text-taco-ink-soft"
-                htmlFor="restaurant-rate"
+                htmlFor={`${fieldIdPrefix}restaurant-rate`}
               >
                 評価 <RequiredBadge />
               </Label>
@@ -154,7 +164,7 @@ export function RestaurantForm({ onRegistered }: Props) {
                 <Input
                   aria-label="評価"
                   className="h-12 w-24 border-taco-border bg-taco-surface-raised text-center font-mono text-xl font-bold"
-                  id="restaurant-rate"
+                  id={`${fieldIdPrefix}restaurant-rate`}
                   inputMode="decimal"
                   onChange={(event) => form.setRateInput(event.target.value)}
                   placeholder="5"
@@ -169,13 +179,13 @@ export function RestaurantForm({ onRegistered }: Props) {
             <div className="space-y-2">
               <Label
                 className="text-sm font-semibold tracking-normal text-taco-ink-soft"
-                htmlFor="restaurant-memo"
+                htmlFor={`${fieldIdPrefix}restaurant-memo`}
               >
                 おいしいものメモ <span className="normal-case text-taco-muted">（任意）</span>
               </Label>
               <textarea
                 className="min-h-12 w-full resize-y border border-taco-border bg-taco-paper-bright px-3 py-2.5 text-base text-taco-ink outline-none placeholder:text-taco-muted focus-visible:ring-2 focus-visible:ring-taco-roja-strong"
-                id="restaurant-memo"
+                id={`${fieldIdPrefix}restaurant-memo`}
                 maxLength={1000}
                 onChange={(event) => form.setMemo(event.target.value)}
                 placeholder="例: ケサディーヤが最高です"
@@ -188,13 +198,18 @@ export function RestaurantForm({ onRegistered }: Props) {
           <div className="space-y-2">
             <Label
               className="text-sm font-semibold tracking-normal text-taco-ink-soft"
-              htmlFor="restaurant-photo"
+              htmlFor={`${fieldIdPrefix}restaurant-photo`}
             >
-              写真 <RequiredBadge />
+              写真{" "}
+              {isEditing ? (
+                <span className="normal-case text-taco-muted">（変更する場合のみ）</span>
+              ) : (
+                <RequiredBadge />
+              )}
             </Label>
             <label
               className="group flex min-h-28 cursor-pointer items-center gap-4 rounded-md border border-dashed border-taco-tortilla/70 bg-taco-tortilla/20 px-4 py-4 transition-colors hover:bg-taco-tortilla/30"
-              htmlFor="restaurant-photo"
+              htmlFor={`${fieldIdPrefix}restaurant-photo`}
             >
               <span className="grid size-10 shrink-0 place-items-center border border-taco-tortilla/60 bg-taco-surface text-taco-verde-strong">
                 <ImagePlus className="size-5" />
@@ -204,43 +219,61 @@ export function RestaurantForm({ onRegistered }: Props) {
                   {form.photo ? form.photo.name : "端末から写真を選ぶ"}
                 </span>
                 <span className="mt-1 block text-sm text-taco-muted">
-                  {form.photo ? "クリックして別の写真に変更" : "JPEG / PNG / WebP ・ 8 MB 以下"}
+                  {form.photo
+                    ? "クリックして別の写真に変更"
+                    : isEditing
+                      ? "現在の写真を保持する場合は、そのまま保存"
+                      : "JPEG / PNG / WebP ・ 8 MB 以下"}
                 </span>
               </span>
             </label>
             <input
               accept="image/jpeg,image/png,image/webp"
               className="sr-only"
-              id="restaurant-photo"
+              id={`${fieldIdPrefix}restaurant-photo`}
               onChange={(event) => form.setPhoto(event.target.files?.[0] ?? null)}
-              required
+              required={!isEditing}
               type="file"
             />
-            {photoPreviewUrl ? (
+            {photoUrl ? (
               <span className="size-24 shrink-0 overflow-hidden rounded-sm border border-taco-tortilla/60 bg-taco-surface">
                 <img
-                  alt="選択した写真のプレビュー"
+                  alt={photoPreviewUrl ? "選択した写真のプレビュー" : "登録済みの写真"}
                   className="size-full object-cover"
-                  src={photoPreviewUrl}
+                  src={photoUrl}
                 />
               </span>
             ) : null}
           </div>
         </div>
 
-        <Button
-          className="mt-7 h-12 w-full text-base font-bold"
-          disabled={form.isRegistering || !form.coordinates}
-          size="lg"
-          type="submit"
-        >
-          {form.isRegistering ? <LoaderCircle className="size-4 animate-spin" /> : null}
-          {form.isRegistering
-            ? "保存中…"
-            : form.coordinates
-              ? "この店を地図に残す"
-              : "住所を検索して位置を確認"}
-        </Button>
+        <div className="mt-7 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          {isEditing && onCancel ? (
+            <Button
+              className="h-12 text-base font-bold"
+              onClick={onCancel}
+              type="button"
+              variant="secondary"
+            >
+              キャンセル
+            </Button>
+          ) : null}
+          <Button
+            className="h-12 flex-1 text-base font-bold sm:flex-none"
+            disabled={form.isSaving || !form.coordinates}
+            size="lg"
+            type="submit"
+          >
+            {form.isSaving ? <LoaderCircle className="size-4 animate-spin" /> : null}
+            {form.isSaving
+              ? "保存中…"
+              : isEditing
+                ? "変更を保存"
+                : form.coordinates
+                  ? "この店を地図に残す"
+                  : "住所を検索して位置を確認"}
+          </Button>
+        </div>
       </form>
     </section>
   );

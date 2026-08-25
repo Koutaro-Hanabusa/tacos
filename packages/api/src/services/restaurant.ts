@@ -1,5 +1,5 @@
 import * as schema from "@tacos/db/schema";
-import { and, count, desc, eq, like } from "drizzle-orm";
+import { and, count, desc, eq, like, sql } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { z } from "zod";
 
@@ -31,6 +31,12 @@ export const addRestaurantInput = registerRestaurantInput.extend({
   imageKey: z.string().trim().min(1).max(512),
 });
 
+export const updateRestaurantInput = registerRestaurantInput.extend({
+  latitude: z.number().finite().min(-90).max(90),
+  longitude: z.number().finite().min(-180).max(180),
+  imageKey: z.string().trim().min(1).max(512).optional(),
+});
+
 export const searchRestaurantInput = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   address: z.string().trim().min(1).max(300).optional(),
@@ -41,10 +47,10 @@ export const listRestaurantInput = z.object({
   offset: z.number().int().min(0).optional().default(0),
 });
 
-export function googleMapsUrl(latitude: number, longitude: number) {
+export function googleMapsUrl(name: string, address: string) {
   const url = new URL("https://www.google.com/maps/search/");
   url.searchParams.set("api", "1");
-  url.searchParams.set("query", `${latitude},${longitude}`);
+  url.searchParams.set("query", `${name}, ${address}`);
   return url.toString();
 }
 
@@ -92,13 +98,17 @@ export class RestaurantApi {
   }
 
   async get(id: number) {
+    const restaurant = await this.getRecord(id);
+    return restaurant ? this.toPublicRestaurant(restaurant) : null;
+  }
+
+  async getRecord(id: number) {
     const rows = await this.db
       .select()
       .from(schema.restaurants)
       .where(eq(schema.restaurants.id, id))
       .limit(1);
-    const restaurant = rows[0];
-    return restaurant ? this.toPublicRestaurant(restaurant) : null;
+    return rows[0] ?? null;
   }
 
   async list(input: z.infer<typeof listRestaurantInput>) {
@@ -116,6 +126,26 @@ export class RestaurantApi {
     return rows[0]?.count ?? 0;
   }
 
+  async update(id: number, input: z.infer<typeof updateRestaurantInput>) {
+    const result = await this.db
+      .update(schema.restaurants)
+      .set({
+        name: input.name,
+        address: input.address,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        ...(input.imageKey ? { imageKey: input.imageKey } : {}),
+        rate: input.rate,
+        memo: input.memo,
+        updatedAt: sql`(datetime('now'))`,
+      })
+      .where(eq(schema.restaurants.id, id))
+      .returning();
+    const restaurant = result[0];
+
+    return restaurant ? this.toPublicRestaurant(restaurant) : null;
+  }
+
   async delete(id: number) {
     const result = await this.db
       .delete(schema.restaurants)
@@ -129,13 +159,14 @@ export class RestaurantApi {
 
     return {
       ...publicRestaurant,
-      googleMapsUrl: googleMapsUrl(restaurant.latitude, restaurant.longitude),
-      photoUrl: this.photoUrl(restaurant.id),
+      googleMapsUrl: googleMapsUrl(restaurant.name, restaurant.address),
+      photoUrl: this.photoUrl(restaurant.id, restaurant.updatedAt),
     };
   }
 
-  private photoUrl(restaurantId: number) {
-    const path = `/photos/${restaurantId}`;
+  private photoUrl(restaurantId: number, updatedAt: string | null) {
+    const version = updatedAt ? `?v=${encodeURIComponent(updatedAt)}` : "";
+    const path = `/photos/${restaurantId}${version}`;
 
     return this.options.photoUrlBase ? new URL(path, this.options.photoUrlBase).toString() : path;
   }

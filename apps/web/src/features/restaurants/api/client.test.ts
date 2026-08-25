@@ -11,6 +11,7 @@ import {
   listRestaurants,
   listRestaurantsPage,
   registerRestaurant,
+  updateRestaurant,
 } from "./client";
 
 const fetchMock = vi.fn();
@@ -23,7 +24,8 @@ const restaurant = {
   longitude: 139.706,
   rate: 4.5,
   memo: "カルニタスがよかった",
-  googleMapsUrl: "https://www.google.com/maps/search/?api=1&query=35.671%2C139.706",
+  googleMapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Taquer%C3%ADa+El+Sol%2C+%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%8B%E8%B0%B7%E5%8C%BA%E7%A5%9E%E5%AE%AE%E5%89%8D+1-2-3",
   photoUrl: "https://api.example.test/photos/1",
   createdAt: null,
   updatedAt: null,
@@ -147,5 +149,34 @@ describe("restaurant API client", () => {
       method: "DELETE",
       credentials: "include",
     });
+  });
+
+  it("更新は認証情報付き PATCH で店舗情報を送る", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ restaurant }));
+
+    await expect(
+      updateRestaurant({
+        id: restaurant.id,
+        name: restaurant.name,
+        address: restaurant.address,
+        latitude: restaurant.latitude,
+        longitude: restaurant.longitude,
+        rate: restaurant.rate ?? 0,
+        memo: restaurant.memo ?? "",
+      }),
+    ).resolves.toEqual(restaurant);
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const formData = options.body as FormData;
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.test/api/admin/restaurants/1",
+      expect.objectContaining({ method: "PATCH", credentials: "include" }),
+    );
+    expect(formData.get("name")).toBe(restaurant.name);
+    expect(formData.get("latitude")).toBe("35.671");
+    expect(formData.get("longitude")).toBe("139.706");
+    expect(formData.get("rate")).toBe("4.5");
+    expect(formData.get("memo")).toBe("カルニタスがよかった");
+    expect(formData.get("photo")).toBeNull();
   });
 });
