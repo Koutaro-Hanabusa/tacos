@@ -2,9 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test"
 
 const mocks = vi.hoisted(() => ({
   add: vi.fn(),
+  count: vi.fn(),
   delete: vi.fn(),
   geocodeAddress: vi.fn(),
   get: vi.fn(),
+  list: vi.fn(),
   photoDelete: vi.fn(),
   photoPut: vi.fn(),
 }));
@@ -22,8 +24,10 @@ vi.mock("@tacos/api/services/restaurant", async (importOriginal) => {
 
   class RestaurantApi {
     add = mocks.add;
+    count = mocks.count;
     delete = mocks.delete;
     get = mocks.get;
+    list = mocks.list;
   }
 
   return { ...actual, RestaurantApi };
@@ -75,6 +79,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.photoDelete.mockResolvedValue(undefined);
   mocks.photoPut.mockResolvedValue(undefined);
+  mocks.list.mockResolvedValue([]);
+  mocks.count.mockResolvedValue(0);
 });
 
 afterEach(() => {
@@ -192,5 +198,23 @@ describe("管理者向け店舗 API", () => {
         restaurantId: 7,
       }),
     );
+  });
+});
+
+describe("公開レストラン API", () => {
+  it("limit と offset を使い、総件数を返す", async () => {
+    mocks.list.mockResolvedValue([{ id: 7 }]);
+    mocks.count.mockResolvedValue(21);
+
+    const response = await app.request(
+      "http://localhost/api/restaurants?limit=10&offset=10",
+      {},
+      bindings(),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ restaurants: [{ id: 7 }], total: 21 });
+    expect(mocks.list).toHaveBeenCalledWith({ limit: 10, offset: 10 });
+    expect(mocks.count).toHaveBeenCalledOnce();
   });
 });
