@@ -94,7 +94,7 @@ app.use(
   "/*",
   cors({
     origin: env.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type"],
     credentials: true,
   }),
@@ -240,6 +240,111 @@ app.post("/api/admin/restaurants", async (c) => {
 
     console.error({ event: "restaurant_registration_failed", error: cleanupError(error) });
     return c.json({ error: "登録に失敗しました。もう一度試してください。" }, 500);
+  }
+});
+
+app.patch("/api/admin/restaurants/:restaurantId", async (c) => {
+  const restaurantId = z.coerce.number().int().positive().safeParse(c.req.param("restaurantId"));
+  if (!restaurantId.success) return c.notFound();
+
+  let body: Record<string, string | File | (string | File)[]>;
+  try {
+    body = await c.req.parseBody();
+  } catch {
+    return c.json({ error: "フォームを読み取れませんでした。" }, 400);
+  }
+
+  const parsed = registrationInput.safeParse({
+    name: body.name,
+    address: body.address,
+    rate: body.rate,
+    memo: body.memo,
+    latitude: body.latitude,
+    longitude: body.longitude,
+  });
+  if (!parsed.success) {
+    return c.json({ error: "店名、住所、位置情報を確認してください。" }, 400);
+  }
+
+  const photo = body.photo;
+  let upload:
+    | { bytes: Uint8Array; contentType: keyof typeof acceptedPhotoTypes; extension: string }
+    | undefined;
+
+  if (photo !== undefined) {
+    if (!(photo instanceof File)) {
+      return c.json({ error: "JPEG、PNG、WebP形式の写真を1枚選択してください。" }, 400);
+    }
+
+    if (photo.size === 0 || photo.size > MAX_PHOTO_SIZE) {
+      return c.json({ error: "写真は8 MB以下にしてください。" }, 400);
+    }
+
+    const contentType = photo.type as keyof typeof acceptedPhotoTypes;
+    const extension = acceptedPhotoTypes[contentType];
+    if (!extension) {
+      return c.json({ error: "写真はJPEG、PNG、WebP形式にしてください。" }, 400);
+    }
+
+    const bytes = new Uint8Array(await photo.arrayBuffer());
+    if (!isImageContent(contentType, bytes)) {
+      return c.json({ error: "写真のファイル形式を確認できませんでした。" }, 400);
+    }
+
+    upload = { bytes, contentType, extension };
+  }
+
+  const api = restaurantApi(c);
+  let newR2Key: string | undefined;
+
+  try {
+    const existing = await api.getRecord(restaurantId.data);
+    if (!existing) return c.notFound();
+
+    if (upload) {
+      newR2Key = `restaurants/${crypto.randomUUID()}.${upload.extension}`;
+      await c.env.PHOTOS.put(newR2Key, upload.bytes, {
+        httpMetadata: {
+          contentType: upload.contentType,
+          cacheControl: "public, max-age=31536000, immutable",
+        },
+      });
+    }
+
+    const restaurant = await api.update(restaurantId.data, {
+      ...parsed.data,
+      ...(newR2Key ? { imageKey: newR2Key } : {}),
+    });
+    if (!restaurant) throw new Error("店舗を更新できませんでした。");
+
+    if (newR2Key) {
+      try {
+        await c.env.PHOTOS.delete(existing.imageKey);
+      } catch (error) {
+        console.error({
+          event: "restaurant_photo_cleanup_failed",
+          restaurantId: existing.id,
+          error: cleanupError(error),
+        });
+      }
+    }
+
+    return c.json({ restaurant });
+  } catch (error) {
+    if (newR2Key) {
+      try {
+        await c.env.PHOTOS.delete(newR2Key);
+      } catch (cleanupFailure) {
+        console.error({
+          event: "restaurant_photo_cleanup_failed",
+          restaurantId: restaurantId.data,
+          error: cleanupError(cleanupFailure),
+        });
+      }
+    }
+
+    console.error({ event: "restaurant_update_failed", error: cleanupError(error) });
+    return c.json({ error: "更新に失敗しました。もう一度試してください。" }, 500);
   }
 });
 

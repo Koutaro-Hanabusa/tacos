@@ -1,8 +1,9 @@
 # 管理画面の Cloudflare Access 設定
 
 管理画面は `https://tacos.burio16.com/admin` です。住所検索は
-`POST /api/admin/geocode`、登録は `POST /api/admin/restaurants`、削除は
-`DELETE /api/admin/restaurants/:id` を使います。公開する地図、写真、MCP とは Access
+`POST /api/admin/geocode`、登録は `POST /api/admin/restaurants`、更新は
+`PATCH /api/admin/restaurants/:id`、削除は `DELETE /api/admin/restaurants/:id` を使います。
+更新は登録と同じ店舗項目を受け取り、写真を省略すると既存写真を保持します。公開する地図、写真、MCP とは Access
 アプリを分けず、同じ一つの self-hosted アプリに次の二つの public hostname を追加します。
 
 - `tacos.burio16.com/admin*`
