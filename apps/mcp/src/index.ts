@@ -22,8 +22,30 @@ type Bindings = {
   PHOTO_URL_BASE: string;
 };
 
+const readOnlyToolAnnotations = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  openWorldHint: false,
+  destructiveHint: false,
+} as const;
+
+const publicRestaurantOutput = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  address: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  rate: z.number().min(0).max(5).nullable(),
+  memo: z.string().nullable(),
+  googleMapsUrl: z.string(),
+  photoUrl: z.string(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+});
+
 function restaurantAppResourceMeta(photoUrlBase: string) {
   return {
+    domain: "https://tacos.burio16.com",
     csp: {
       connectDomains: ["https://tile.openstreetmap.org"],
       resourceDomains: ["https://tile.openstreetmap.org", new URL(photoUrlBase).origin, "data:"],
@@ -33,25 +55,6 @@ function restaurantAppResourceMeta(photoUrlBase: string) {
 }
 
 const app = new Hono<{ Bindings: Bindings }>();
-
-const restaurantOutput = z.object({
-  id: z.number().int(),
-  name: z.string(),
-  address: z.string(),
-  latitude: z.number(),
-  longitude: z.number(),
-  rate: z.number().nullable(),
-  memo: z.string().nullable(),
-  googleMapsUrl: z.string(),
-  photoUrl: z.string(),
-  createdAt: z.string().nullable(),
-  updatedAt: z.string().nullable(),
-});
-
-const restaurantResultOutput = {
-  restaurants: z.array(restaurantOutput),
-  query: z.record(z.string(), z.unknown()),
-};
 
 const restaurantSearchToolInput = {
   name: z
@@ -86,6 +89,11 @@ const restaurantListToolInput = {
     .optional()
     .default(0)
     .describe("一覧の開始位置。通常は0のままにする"),
+};
+
+const restaurantResultOutput = {
+  restaurants: z.array(publicRestaurantOutput),
+  query: z.record(z.string(), z.unknown()),
 };
 
 function toolError(message: string) {
@@ -163,7 +171,7 @@ function createMcpServer(db: Db, photoUrlBase: string) {
         "ユーザーが店名、料理名、地域、住所などの条件を指定してタコス店を探すときに使う。例: 「渋谷のタコス店」「La Taqueriaを探して」。name または address を少なくとも1つ指定すること。条件なしで登録済み店舗を一覧・地図表示したい場合は restaurant_list を使う。",
       inputSchema: restaurantSearchToolInput,
       outputSchema: restaurantResultOutput,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+      annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
@@ -188,7 +196,7 @@ function createMcpServer(db: Db, photoUrlBase: string) {
         "ユーザーが登録済みのタコス店を一覧または地図で見たいとき、または「全部見せて」「地図を見せて」と依頼したときに使う。検索条件がある場合は restaurant_search を使う。通常は limit と offset を省略する。",
       inputSchema: restaurantListToolInput,
       outputSchema: restaurantResultOutput,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+      annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
@@ -208,7 +216,7 @@ function createMcpServer(db: Db, photoUrlBase: string) {
         id: z.number().int().positive().describe("直前の検索結果に含まれる店舗ID"),
       },
       outputSchema: restaurantResultOutput,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+      annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
