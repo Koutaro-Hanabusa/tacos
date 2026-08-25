@@ -14,6 +14,7 @@ function McpAppBridge({ app }: { app: App }) {
       emptyTitle="条件に合う店はありません。"
       embedded
       errorMessage={view.errorMessage}
+      onClearSelection={view.clearSelection}
       onOpenLink={view.openLink}
       onSelect={view.selectRestaurant}
       restaurants={view.restaurants}

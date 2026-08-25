@@ -14,6 +14,9 @@ export function useRestaurantApp(app: App) {
   const selectRestaurant = useCallback((id: number) => {
     setView((current) => ({ ...current, selectedId: id }));
   }, []);
+  const clearSelection = useCallback(() => {
+    setView((current) => ({ ...current, selectedId: undefined }));
+  }, []);
   const openLink = useCallback(
     (url: string) => {
       void app.openLink({ url }).catch(() => undefined);
@@ -67,5 +70,5 @@ export function useRestaurantApp(app: App) {
     };
   }, [app]);
 
-  return { ...view, openLink, selectRestaurant };
+  return { ...view, clearSelection, openLink, selectRestaurant };
 }

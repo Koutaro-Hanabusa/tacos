@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { restaurantsPageQueryOptions } from "@/features/restaurants/api/queries";
+import {
+  restaurantsMapQueryOptions,
+  restaurantsPageQueryOptions,
+} from "@/features/restaurants/api/queries";
 
 import { HomeError } from "./-components/fallbacks/HomeError";
 import { HomePending } from "./-components/fallbacks/HomePending";
@@ -32,7 +35,10 @@ export const Route = createFileRoute("/")({
     page: Math.max(0, (search.page ?? 1) - 1),
   }),
   loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(restaurantsPageQueryOptions(deps.page)),
+    Promise.all([
+      context.queryClient.ensureQueryData(restaurantsPageQueryOptions(deps.page)),
+      context.queryClient.ensureQueryData(restaurantsMapQueryOptions()),
+    ]),
   pendingComponent: HomePending,
   errorComponent: HomeError,
   component: HomePage,

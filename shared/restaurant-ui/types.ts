@@ -33,10 +33,12 @@ export interface RestaurantListItemProps {
   selected: boolean;
   onSelect: (id: number) => void;
   onOpenLink?: (url: string) => void;
+  onClose?: () => void;
 }
 
 export interface RestaurantResultsViewProps {
   restaurants: RestaurantViewData[];
+  mapRestaurants?: RestaurantViewData[];
   selectedId?: number;
   onSelect: (id: number) => void;
   title: ReactNode;
@@ -47,6 +49,7 @@ export interface RestaurantResultsViewProps {
   errorMessage?: string;
   embedded?: boolean;
   onOpenLink?: (url: string) => void;
+  onClearSelection?: () => void;
   totalCount?: number;
   page?: number;
   pageSize?: number;

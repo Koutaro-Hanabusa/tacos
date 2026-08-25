@@ -8,6 +8,7 @@ import type { RestaurantResultsViewProps } from "./types";
 
 export function RestaurantResultsView({
   restaurants,
+  mapRestaurants,
   selectedId,
   onSelect,
   title,
@@ -18,13 +19,24 @@ export function RestaurantResultsView({
   errorMessage,
   embedded = false,
   onOpenLink,
+  onClearSelection,
   totalCount,
   page = 0,
   pageSize = 10,
   onPageChange,
   pageLoading = false,
 }: RestaurantResultsViewProps) {
-  const markers = useMemo(() => toRestaurantMarkers(restaurants), [restaurants]);
+  const markers = useMemo(
+    () => toRestaurantMarkers(mapRestaurants ?? restaurants),
+    [mapRestaurants, restaurants],
+  );
+  const selectedRestaurant = useMemo(
+    () =>
+      selectedId === undefined
+        ? undefined
+        : (mapRestaurants ?? restaurants).find(({ id }) => id === selectedId),
+    [mapRestaurants, restaurants, selectedId],
+  );
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,16 +44,19 @@ export function RestaurantResultsView({
   }, [page]);
 
   const mainClassName = embedded
-    ? "grid min-w-0 grid-rows-[auto_22rem] bg-taco-paper md:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)] md:grid-rows-1"
-    : "grid min-h-[calc(100svh-4rem)] min-w-0 bg-taco-paper text-taco-ink lg:h-[calc(100svh-4rem)] lg:min-h-0 lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
+    ? "relative grid min-h-[28rem] min-w-0 bg-taco-paper text-taco-ink lg:h-[min(100svh,42rem)] lg:min-h-0 lg:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)] lg:grid-rows-1"
+    : "relative grid min-h-[calc(100svh-4rem)] min-w-0 bg-taco-paper text-taco-ink lg:h-[calc(100svh-4rem)] lg:min-h-0 lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
 
   const asideClassName = embedded
-    ? "bg-taco-surface md:flex md:min-h-0 md:flex-col md:overflow-hidden"
-    : "border-b border-taco-border/60 bg-taco-surface lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:border-r lg:border-b-0";
+    ? "hidden border-b border-taco-border/60 bg-taco-surface lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:border-r lg:border-b-0"
+    : "hidden border-b border-taco-border/60 bg-taco-surface lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:border-r lg:border-b-0";
 
   const resultsClassName = embedded
     ? "space-y-2 p-3 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain"
     : "space-y-2 p-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain";
+  const mapSectionClassName = embedded
+    ? "relative h-[min(100svh,42rem)] min-h-[28rem] min-w-0 overflow-hidden bg-taco-paper-bright lg:h-auto lg:min-h-0"
+    : "relative h-[calc(100svh-4rem)] min-h-[22rem] min-w-0 overflow-hidden bg-taco-paper-bright lg:h-auto";
   const headerClassName = "shrink-0 px-5 py-5 border-b border-taco-border/60";
   const pagerClassName = embedded ? "md:shrink-0" : "lg:shrink-0";
   const hasPageData = totalCount !== undefined;
@@ -54,22 +69,30 @@ export function RestaurantResultsView({
       ? `${firstVisibleResult}–${lastVisibleResult} / ${totalCount}件`
       : `0 / ${totalCount}件`
     : `${restaurants.length}件`;
+  const introContent = (
+    <div className="mt-2 flex items-end justify-between gap-4">
+      <div>
+        <h1 className="m-0 text-3xl leading-none font-extrabold tracking-[-0.04em]">{title}</h1>
+        <p className="mt-3 mb-0 whitespace-pre-line text-sm leading-relaxed text-taco-muted">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+  const mapMessageClassName = embedded
+    ? "absolute inset-x-3 top-1/2 z-20 -translate-y-1/2 rounded-md border border-taco-border/70 bg-taco-surface/95 px-7 py-4 text-center lg:hidden"
+    : "absolute inset-x-3 top-1/2 z-20 -translate-y-1/2 rounded-md border border-taco-border/70 bg-taco-surface/95 px-7 py-4 text-center lg:hidden";
+  const mapIntroClassName = embedded
+    ? "absolute inset-x-0 top-0 z-20 border-b border-taco-border/60 bg-taco-surface px-5 py-4 lg:hidden"
+    : "absolute inset-x-0 top-0 z-20 border-b border-taco-border/60 bg-taco-surface px-5 py-4 lg:hidden";
+  const selectedCardClassName = embedded
+    ? "absolute inset-x-3 bottom-3 z-20 lg:hidden"
+    : "absolute inset-x-3 bottom-3 z-20 lg:hidden";
 
   return (
     <main className={mainClassName}>
       <aside className={asideClassName}>
-        <header className={headerClassName}>
-          <div className="mt-2 flex items-end justify-between gap-4">
-            <div>
-              <h1 className="m-0 text-3xl leading-none font-extrabold tracking-[-0.04em]">
-                {title}
-              </h1>
-              <p className="mt-3 mb-0 whitespace-pre-line text-sm leading-relaxed text-taco-muted">
-                {description}
-              </p>
-            </div>
-          </div>
-        </header>
+        <header className={headerClassName}>{introContent}</header>
 
         <div
           ref={resultsRef}
@@ -167,7 +190,9 @@ export function RestaurantResultsView({
         ) : null}
       </aside>
 
-      <section className="relative min-h-[22rem] min-w-0 overflow-hidden bg-taco-paper-bright">
+      <header className={mapIntroClassName}>{introContent}</header>
+
+      <section className={mapSectionClassName}>
         <div className="taco-spectrum pointer-events-none absolute inset-x-0 top-0 z-10 h-1" />
         <RestaurantMap
           markers={markers}
@@ -175,6 +200,39 @@ export function RestaurantResultsView({
           onSelect={onSelect}
           selectedId={selectedId}
         />
+        {status !== "ready" || restaurants.length === 0 ? (
+          <div
+            aria-live="polite"
+            className={mapMessageClassName}
+            role={status === "error" ? "alert" : undefined}
+          >
+            {status === "loading" ? (
+              <p className="m-0 text-xl font-bold">検索結果を待っています。</p>
+            ) : status === "error" ? (
+              <p className="m-0 text-sm leading-relaxed text-taco-roja-strong">
+                {errorMessage || "検索結果を取得できませんでした。"}
+              </p>
+            ) : (
+              <>
+                <p className="m-0 text-xl font-bold">{emptyTitle}</p>
+                <p className="mt-2 mb-0 text-sm leading-relaxed text-taco-muted">
+                  {emptyDescription}
+                </p>
+              </>
+            )}
+          </div>
+        ) : null}
+        {selectedRestaurant ? (
+          <div className={selectedCardClassName}>
+            <RestaurantListItem
+              onClose={onClearSelection}
+              onOpenLink={onOpenLink}
+              onSelect={onSelect}
+              restaurant={selectedRestaurant}
+              selected
+            />
+          </div>
+        ) : null}
       </section>
     </main>
   );
