@@ -22,8 +22,30 @@ type Bindings = {
   PHOTO_URL_BASE: string;
 };
 
+const readOnlyToolAnnotations = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  openWorldHint: false,
+  destructiveHint: false,
+} as const;
+
+const publicRestaurantOutput = z.object({
+  id: z.number().int(),
+  name: z.string(),
+  address: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  rate: z.number().min(0).max(5).nullable(),
+  memo: z.string().nullable(),
+  googleMapsUrl: z.string(),
+  photoUrl: z.string(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+});
+
 function restaurantAppResourceMeta(photoUrlBase: string) {
   return {
+    domain: "https://tacos.burio16.com",
     csp: {
       connectDomains: ["https://tile.openstreetmap.org"],
       resourceDomains: ["https://tile.openstreetmap.org", new URL(photoUrlBase).origin, "data:"],
@@ -33,12 +55,6 @@ function restaurantAppResourceMeta(photoUrlBase: string) {
 }
 
 const app = new Hono<{ Bindings: Bindings }>();
-
-function textResult(result: unknown) {
-  return {
-    content: [{ type: "text" as const, text: JSON.stringify(result, null, 2) }],
-  };
-}
 
 function restaurantResult(
   restaurants: Awaited<ReturnType<RestaurantApi["search"]>>,
@@ -103,6 +119,14 @@ function createMcpServer(db: Db, photoUrlBase: string) {
         name: z.string().optional(),
         address: z.string().optional(),
       },
+      outputSchema: {
+        restaurants: z.array(publicRestaurantOutput),
+        query: z.object({
+          name: z.string().optional(),
+          address: z.string().optional(),
+        }),
+      },
+      annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
@@ -120,6 +144,14 @@ function createMcpServer(db: Db, photoUrlBase: string) {
         limit: z.number().int().min(1).max(100).optional().default(20),
         offset: z.number().int().min(0).optional().default(0),
       },
+      outputSchema: {
+        restaurants: z.array(publicRestaurantOutput),
+        query: z.object({
+          limit: z.number().int().min(1).max(100),
+          offset: z.number().int().min(0),
+        }),
+      },
+      annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
@@ -128,11 +160,22 @@ function createMcpServer(db: Db, photoUrlBase: string) {
     },
   );
 
-  server.tool(
+  server.registerTool(
     "restaurant_get",
-    "IDでレストランを1件取得する",
-    { id: z.number().int() },
-    async (args) => textResult(await api.get(args.id)),
+    {
+      description: "IDでレストランを1件取得する",
+      inputSchema: { id: z.number().int() },
+      outputSchema: { restaurant: publicRestaurantOutput.nullable() },
+      annotations: readOnlyToolAnnotations,
+    },
+    async (args) => {
+      const restaurant = await api.get(args.id);
+
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(restaurant, null, 2) }],
+        structuredContent: { restaurant },
+      };
+    },
   );
 
   return server;
