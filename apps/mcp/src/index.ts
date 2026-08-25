@@ -56,6 +56,53 @@ function restaurantAppResourceMeta(photoUrlBase: string) {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
+const restaurantSearchToolInput = {
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(120)
+    .optional()
+    .describe("店名や店名に含まれる語。例: タコス、La Taqueria"),
+  address: z
+    .string()
+    .trim()
+    .min(1)
+    .max(300)
+    .optional()
+    .describe("地域・住所。例: 渋谷、新宿区、東京都渋谷区"),
+};
+
+const restaurantListToolInput = {
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(20)
+    .describe("一度に表示する件数。通常は省略し、全件を求められた場合だけ調整する"),
+  offset: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .default(0)
+    .describe("一覧の開始位置。通常は0のままにする"),
+};
+
+const restaurantResultOutput = {
+  restaurants: z.array(publicRestaurantOutput),
+  query: z.record(z.string(), z.unknown()),
+};
+
+function toolError(message: string) {
+  return {
+    content: [{ type: "text" as const, text: message }],
+    isError: true,
+  };
+}
+
 function restaurantResult(
   restaurants: Awaited<ReturnType<RestaurantApi["search"]>>,
   query: unknown,
@@ -76,7 +123,12 @@ function restaurantResult(
     content: [
       {
         type: "text" as const,
-        text: [`${restaurants.length} 件のレストランが見つかりました。`, ...details].join("\n\n"),
+        text: [
+          restaurants.length > 0
+            ? `${restaurants.length} 件のレストランが見つかりました。地図と一覧から確認できます。`
+            : "条件に合うレストランは見つかりませんでした。店名や地域を変えて再検索できます。",
+          ...details,
+        ].join("\n\n"),
       },
     ],
     structuredContent: { restaurants, query },
@@ -114,23 +166,23 @@ function createMcpServer(db: Db, photoUrlBase: string) {
     server,
     "restaurant_search",
     {
-      description: "レストランを名前・住所で検索する",
-      inputSchema: {
-        name: z.string().optional(),
-        address: z.string().optional(),
-      },
-      outputSchema: {
-        restaurants: z.array(publicRestaurantOutput),
-        query: z.object({
-          name: z.string().optional(),
-          address: z.string().optional(),
-        }),
-      },
+      title: "タコス店を条件検索",
+      description:
+        "ユーザーが店名、料理名、地域、住所などの条件を指定してタコス店を探すときに使う。例: 「渋谷のタコス店」「La Taqueriaを探して」。name または address を少なくとも1つ指定すること。条件なしで登録済み店舗を一覧・地図表示したい場合は restaurant_list を使う。",
+      inputSchema: restaurantSearchToolInput,
+      outputSchema: restaurantResultOutput,
       annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
-      const input = searchRestaurantInput.parse(args);
+      const parsed = searchRestaurantInput.safeParse(args);
+      if (!parsed.success || (!parsed.data.name && !parsed.data.address)) {
+        return toolError(
+          "店名または地域・住所を指定して検索してください。条件なしなら一覧表示を使います。",
+        );
+      }
+
+      const input = parsed.data;
       return restaurantResult(await api.search(input), input);
     },
   );
@@ -139,18 +191,11 @@ function createMcpServer(db: Db, photoUrlBase: string) {
     server,
     "restaurant_list",
     {
-      description: "レストラン一覧を取得する（ページング対応）",
-      inputSchema: {
-        limit: z.number().int().min(1).max(100).optional().default(20),
-        offset: z.number().int().min(0).optional().default(0),
-      },
-      outputSchema: {
-        restaurants: z.array(publicRestaurantOutput),
-        query: z.object({
-          limit: z.number().int().min(1).max(100),
-          offset: z.number().int().min(0),
-        }),
-      },
+      title: "登録済みの店舗を一覧表示",
+      description:
+        "ユーザーが登録済みのタコス店を一覧または地図で見たいとき、または「全部見せて」「地図を見せて」と依頼したときに使う。検索条件がある場合は restaurant_search を使う。通常は limit と offset を省略する。",
+      inputSchema: restaurantListToolInput,
+      outputSchema: restaurantResultOutput,
       annotations: readOnlyToolAnnotations,
       _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
@@ -160,21 +205,25 @@ function createMcpServer(db: Db, photoUrlBase: string) {
     },
   );
 
-  server.registerTool(
+  registerAppTool(
+    server,
     "restaurant_get",
     {
-      description: "IDでレストランを1件取得する",
-      inputSchema: { id: z.number().int() },
-      outputSchema: { restaurant: publicRestaurantOutput.nullable() },
+      title: "店舗の詳細を再表示",
+      description:
+        "検索結果に含まれる店舗IDを指定して、1店舗の詳細を地図と一覧で再表示するときだけ使う。ユーザーがIDを指定していない場合は restaurant_search または restaurant_list を使う。",
+      inputSchema: {
+        id: z.number().int().positive().describe("直前の検索結果に含まれる店舗ID"),
+      },
+      outputSchema: restaurantResultOutput,
       annotations: readOnlyToolAnnotations,
+      _meta: { ui: { resourceUri: RESTAURANT_APP_RESOURCE_URI } },
     },
     async (args) => {
       const restaurant = await api.get(args.id);
+      if (!restaurant) return toolError("指定された店舗は見つかりませんでした。");
 
-      return {
-        content: [{ type: "text" as const, text: JSON.stringify(restaurant, null, 2) }],
-        structuredContent: { restaurant },
-      };
+      return restaurantResult([restaurant], { id: args.id });
     },
   );
 
