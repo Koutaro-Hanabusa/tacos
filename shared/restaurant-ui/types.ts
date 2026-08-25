@@ -47,4 +47,9 @@ export interface RestaurantResultsViewProps {
   errorMessage?: string;
   embedded?: boolean;
   onOpenLink?: (url: string) => void;
+  totalCount?: number;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  pageLoading?: boolean;
 }
