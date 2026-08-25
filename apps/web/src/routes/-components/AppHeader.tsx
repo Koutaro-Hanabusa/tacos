@@ -11,7 +11,7 @@ export function AppHeader() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="relative z-20 w-full border-b border-taco-border bg-taco-white text-taco-ink">
+    <header className="relative z-50 w-full border-b border-taco-border bg-taco-white text-taco-ink">
       <div className="mx-auto flex h-16 items-center justify-between px-8">
         <Link
           aria-label="Burio de Tacos"
@@ -33,7 +33,7 @@ export function AppHeader() {
           className={[
             "items-center gap-6 md:flex",
             menuOpen
-              ? "absolute inset-x-0 top-full flex flex-col border-b border-taco-border bg-taco-white px-4 py-3 md:static md:flex-row md:border-0 md:bg-transparent md:p-0"
+              ? "absolute inset-x-0 top-full z-50 flex flex-col border-b border-taco-border bg-taco-white px-4 py-3 shadow-lg md:static md:flex-row md:border-0 md:bg-transparent md:p-0 md:shadow-none"
               : "hidden md:flex",
           ].join(" ")}
         >
