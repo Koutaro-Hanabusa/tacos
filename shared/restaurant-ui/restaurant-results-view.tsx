@@ -44,18 +44,18 @@ export function RestaurantResultsView({
   }, [page]);
 
   const mainClassName = embedded
-    ? "relative grid min-h-[28rem] min-w-0 bg-taco-paper text-taco-ink lg:h-[min(100svh,42rem)] lg:min-h-0 lg:grid-cols-[minmax(18rem,0.82fr)_minmax(0,1.6fr)] lg:grid-rows-1"
+    ? "relative grid min-h-[640px] min-w-0 bg-taco-paper text-taco-ink"
     : "relative grid min-h-[calc(100svh-4rem)] min-w-0 bg-taco-paper text-taco-ink lg:h-[calc(100svh-4rem)] lg:min-h-0 lg:grid-cols-[minmax(20rem,0.78fr)_minmax(0,1.7fr)]";
 
   const asideClassName = embedded
-    ? "hidden border-b border-taco-border/60 bg-taco-surface lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:border-r lg:border-b-0"
+    ? "hidden"
     : "hidden border-b border-taco-border/60 bg-taco-surface lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden lg:border-r lg:border-b-0";
 
   const resultsClassName = embedded
     ? "space-y-2 p-3 md:min-h-0 md:flex-1 md:overflow-y-auto md:overscroll-contain"
     : "space-y-2 p-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain";
   const mapSectionClassName = embedded
-    ? "relative h-[min(100svh,42rem)] min-h-[28rem] min-w-0 overflow-hidden bg-taco-paper-bright lg:h-auto lg:min-h-0"
+    ? "relative h-[520px] min-h-[520px] min-w-0 overflow-hidden bg-taco-paper-bright"
     : "relative h-[calc(100svh-4rem)] min-h-[22rem] min-w-0 overflow-hidden bg-taco-paper-bright lg:h-auto";
   const headerClassName = "shrink-0 px-5 py-5 border-b border-taco-border/60";
   const pagerClassName = embedded ? "md:shrink-0" : "lg:shrink-0";
@@ -80,13 +80,13 @@ export function RestaurantResultsView({
     </div>
   );
   const mapMessageClassName = embedded
-    ? "absolute inset-x-3 top-1/2 z-20 -translate-y-1/2 rounded-md border border-taco-border/70 bg-taco-surface/95 px-7 py-4 text-center lg:hidden"
+    ? "absolute inset-x-3 top-1/2 z-20 -translate-y-1/2 rounded-md border border-taco-border/70 bg-taco-surface/95 px-7 py-4 text-center"
     : "absolute inset-x-3 top-1/2 z-20 -translate-y-1/2 rounded-md border border-taco-border/70 bg-taco-surface/95 px-7 py-4 text-center lg:hidden";
   const mapIntroClassName = embedded
-    ? "absolute inset-x-0 top-0 z-20 border-b border-taco-border/60 bg-taco-surface px-5 py-4 lg:hidden"
+    ? "relative z-20 border-b border-taco-border/60 bg-taco-surface px-5 py-4"
     : "absolute inset-x-0 top-0 z-20 border-b border-taco-border/60 bg-taco-surface px-5 py-4 lg:hidden";
   const selectedCardClassName = embedded
-    ? "absolute inset-x-3 bottom-3 z-20 lg:hidden"
+    ? "absolute inset-x-3 bottom-3 z-20"
     : "absolute inset-x-3 bottom-3 z-20 lg:hidden";
 
   return (

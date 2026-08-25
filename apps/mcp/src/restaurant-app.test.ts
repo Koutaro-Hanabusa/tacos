@@ -10,7 +10,7 @@ describe("restaurant MCP App", () => {
   test("keeps the MCP resource module focused on serving the built app", () => {
     const resource = source("./restaurant-app.ts");
 
-    expect(resource).toContain("ui://tacos/restaurant-map-v8.html");
+    expect(resource).toContain("ui://tacos/restaurant-map-v9.html");
     expect(resource).toContain("../dist/app/restaurant-app.js");
     expect(resource).not.toContain("<style>");
     expect(resource).not.toContain("<script");
@@ -102,6 +102,12 @@ describe("restaurant MCP App", () => {
     expect(server).toContain(
       'resourceDomains: ["https://tile.openstreetmap.org", new URL(photoUrlBase).origin, "data:"]',
     );
+    expect(server).toContain('domain: "https://tacos.burio16.com"');
+    expect(server).toContain("readOnlyHint: true");
+    expect(server).toContain("idempotentHint: true");
+    expect(server).toContain("openWorldHint: false");
+    expect(server).toContain("destructiveHint: false");
+    expect(server).toContain("outputSchema");
     expect(server).toContain("_meta: { ui: appResourceMeta }");
     expect(server).toContain("_meta: { ...appResourceMeta, ui: appResourceMeta }");
     expect(server).not.toContain("frameDomains");
