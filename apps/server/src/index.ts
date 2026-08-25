@@ -119,7 +119,10 @@ app.get("/api/restaurants", async (c) => {
     return c.json({ error: "limit と offset の指定が不正です。" }, 400);
   }
 
-  return c.json({ restaurants: await restaurantApi(c).list(input.data) });
+  const api = restaurantApi(c);
+  const [restaurants, total] = await Promise.all([api.list(input.data), api.count()]);
+
+  return c.json({ restaurants, total });
 });
 
 app.use("/api/admin/*", requireAdminAccess);

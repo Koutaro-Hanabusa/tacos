@@ -17,6 +17,7 @@ const restaurantSchema = z.object({
 
 const restaurantsResponse = z.object({
   restaurants: z.array(restaurantSchema),
+  total: z.number().int().nonnegative().optional(),
 });
 
 const coordinatesSchema = z.object({
@@ -32,6 +33,10 @@ const errorResponse = z.object({ error: z.string() });
 
 export type Restaurant = z.infer<typeof restaurantSchema>;
 export type Coordinates = z.infer<typeof coordinatesSchema>;
+export type RestaurantsPage = {
+  restaurants: Restaurant[];
+  total: number;
+};
 
 function endpoint(path: string) {
   return new URL(path, env.VITE_SERVER_URL).toString();
@@ -44,13 +49,30 @@ async function responseError(response: Response) {
   return parsed.success ? parsed.data.error : "リクエストに失敗しました。";
 }
 
-export async function listRestaurants() {
-  const response = await fetch(endpoint("/api/restaurants"), {
+async function fetchRestaurants(input?: { limit?: number; offset?: number }) {
+  const url = new URL(endpoint("/api/restaurants"));
+  if (input?.limit !== undefined) url.searchParams.set("limit", String(input.limit));
+  if (input?.offset !== undefined) url.searchParams.set("offset", String(input.offset));
+
+  const response = await fetch(url.toString(), {
     headers: { Accept: "application/json" },
   });
   if (!response.ok) throw new Error(await responseError(response));
 
-  return restaurantsResponse.parse(await response.json()).restaurants;
+  return restaurantsResponse.parse(await response.json());
+}
+
+export async function listRestaurants() {
+  return (await fetchRestaurants()).restaurants;
+}
+
+export async function listRestaurantsPage(input: { limit: number; offset: number }) {
+  const response = await fetchRestaurants(input);
+
+  return {
+    restaurants: response.restaurants,
+    total: response.total ?? response.restaurants.length,
+  } satisfies RestaurantsPage;
 }
 
 export async function geocodeAddress(address: string) {

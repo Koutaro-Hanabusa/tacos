@@ -1,5 +1,5 @@
 import * as schema from "@tacos/db/schema";
-import { and, desc, eq, like } from "drizzle-orm";
+import { and, count, desc, eq, like } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { z } from "zod";
 
@@ -109,6 +109,11 @@ export class RestaurantApi {
       .limit(input.limit)
       .offset(input.offset);
     return rows.map((restaurant) => this.toPublicRestaurant(restaurant));
+  }
+
+  async count() {
+    const rows = await this.db.select({ count: count() }).from(schema.restaurants);
+    return rows[0]?.count ?? 0;
   }
 
   async delete(id: number) {
