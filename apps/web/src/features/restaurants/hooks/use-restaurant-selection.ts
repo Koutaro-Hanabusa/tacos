@@ -6,12 +6,10 @@ export function useRestaurantSelection(
   restaurants: Restaurant[],
   {
     allRestaurants = restaurants,
-    fallbackToFirst = true,
     pageSize = 10,
     syncPage = false,
   }: {
     allRestaurants?: Restaurant[];
-    fallbackToFirst?: boolean;
     pageSize?: number;
     syncPage?: boolean;
   } = {},
@@ -21,9 +19,7 @@ export function useRestaurantSelection(
   const requestedRestaurantId = search.restaurant;
   const selectedRestaurantId = allRestaurants.some(({ id }) => id === requestedRestaurantId)
     ? requestedRestaurantId
-    : fallbackToFirst
-      ? restaurants[0]?.id
-      : undefined;
+    : undefined;
 
   function selectRestaurant(id: number) {
     void navigate({
