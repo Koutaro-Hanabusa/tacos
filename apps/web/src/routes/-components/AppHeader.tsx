@@ -14,7 +14,7 @@ export function AppHeader() {
     <header className="relative z-50 w-full border-b border-taco-border bg-taco-white text-taco-ink">
       <div className="mx-auto flex h-16 items-center justify-between px-8">
         <Link
-          aria-label="Burio de Tacos"
+          aria-label="Tacos de Burio"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
           to="/"
           onClick={closeMenu}
@@ -24,7 +24,7 @@ export function AppHeader() {
             className="h-10 w-10 object-contain sm:h-12 sm:w-12"
             src="https://burio16.com/burio.com_transparent.svg"
           />
-          <span className="text-lg font-bold sm:text-xl">Burio de Tacos</span>
+          <span className="text-lg font-bold sm:text-xl">Tacos de Burio</span>
         </Link>
 
         <nav
